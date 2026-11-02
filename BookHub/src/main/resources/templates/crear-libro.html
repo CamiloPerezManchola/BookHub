@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(
+    'Publish a Book | BookHub',
+    'Share your book with the BookHub community.'
+)}">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container create-book-container">
+
+        <div class="create-book-header">
+
+            <a th:href="@{/explorar}" class="btn-back">
+                ← Back to Explore
+            </a>
+
+            <h1>Publish a Book</h1>
+
+            <p>
+                Share your favorite books with the BookHub community.
+            </p>
+
+        </div>
+
+        <section class="create-book-card">
+
+            <form id="createBookForm">
+
+                <!-- CSRF -->
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}"
+                       id="csrfToken">
+
+                <input type="hidden"
+                       th:value="${_csrf.headerName}"
+                       id="csrfHeader">
+
+                <!-- Title -->
+                <div class="form-group">
+
+                    <label for="titulo">Book Title</label>
+
+                    <input type="text"
+                           id="titulo"
+                           maxlength="255"
+                           placeholder="Enter the book title"
+                           required>
+
+                </div>
+
+                <!-- Author -->
+                <div class="form-group">
+
+                    <label for="autor">Author</label>
+
+                    <input type="text"
+                           id="autor"
+                           placeholder="Enter the author's name"
+                           required>
+
+                </div>
+
+                <!-- Cover URL -->
+                <div class="form-group">
+
+                    <label for="portadaUrl">Book Cover URL</label>
+
+                    <input type="url"
+                           id="portadaUrl"
+                           placeholder="https://example.com/cover.jpg">
+
+                </div>
+
+                <!-- Year and Genre -->
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="anio">Publication Year</label>
+
+                        <input type="number"
+                               id="anio"
+                               min="0"
+                               max="2026"
+                               placeholder="2020"
+                               required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="genero">Genre</label>
+
+                        <select id="genero" required>
+
+                            <option value="">Select a genre</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Science Fiction">Science Fiction</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Mystery">Mystery</option>
+                            <option value="Horror">Horror</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Biography">Biography</option>
+                            <option value="History">History</option>
+                            <option value="Other">Other</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <!-- Synopsis -->
+                <div class="form-group">
+
+                    <label for="sinopsis">Synopsis</label>
+
+                    <textarea id="sinopsis"
+                              rows="6"
+                              placeholder="Tell us what this book is about..."
+                              required>
+                    </textarea>
+
+                </div>
+
+                <!-- Response message -->
+                <p id="bookMessage"
+                   role="status"
+                   aria-live="polite">
+                </p>
+
+                <button type="submit"
+                        id="publishBookBtn"
+                        class="btn-primary">
+
+                    Publish Book
+
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/crear-libro.js}" defer></script>
+
+</body>
+</html>
