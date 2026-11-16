@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header th:fragment="header" class="top-bar">
+
+    <!-- Brand -->
+    <a th:href="@{/}" class="logo-container text-decoration-none">
+        <div class="logo-placeholder">📖</div>
+        <span class="brand-name">Bookhub</span>
+    </a>
+
+    <div class="header-right">
+
+        <!-- Search -->
+        
+        <form th:action="@{/explorar}" method="get" class="search-box">
+            <span class="search-icon">🔍</span>
+
+            <input type="search"
+                name="q"
+                placeholder="Search books..."
+                aria-label="Search books">
+
+            <span class="kbd-shortcut">⌘ K</span>
+        </form>
+
+
+        <!-- Logged out -->
+        <a th:if="${currentUser == null}"
+           th:href="@{/login}"
+           class="btn-login">
+            Login
+        </a>
+
+        <!-- Logged in -->
+        <details th:if="${currentUser != null}"
+                 class="profile-dropdown">
+
+            <summary class="profile-trigger">
+
+                <img th:if="${currentUser.fotoPerfilUrl != null
+                             and !#strings.isEmpty(currentUser.fotoPerfilUrl)}"
+                     th:src="${currentUser.fotoPerfilUrl}"
+                     alt="Profile picture"
+                     class="header-avatar">
+
+                <div th:unless="${currentUser.fotoPerfilUrl != null
+                                 and !#strings.isEmpty(currentUser.fotoPerfilUrl)}"
+                     class="header-avatar avatar-placeholder">
+                    👤
+                </div>
+
+                <span class="header-username"
+                      th:text="${currentUser.nombre}">
+                    User
+                </span>
+
+                <span class="profile-arrow">⌄</span>
+
+            </summary>
+
+            
+            <div class="profile-menu">
+
+                <a th:href="@{/mibiblioteca}">
+                    <span>📚</span>
+                    My Library
+                </a>
+
+                <a th:href="@{/perfil/editar}">
+                    <span>✏️</span>
+                    Edit Profile
+                </a>
+
+                <a th:href="@{/crear-libro}"
+                    class="btn-primary">
+                    + Publish a Book
+                </a>
+
+                <div class="profile-menu-divider"></div>
+
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="logout-option">
+                        <span>↪</span>
+                        Log out
+                    </button>
+                </form>
+
+            </div>
+
+
+        </details>
+
+    </div>
+
+</header>
+
+</body>
+</html>

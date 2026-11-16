@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(
+    'Edit Book | BookHub',
+    'Update your published book information.'
+)}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container book-edit-container">
+
+    <section class="book-edit-card">
+
+        <div class="book-edit-heading">
+
+            <span>BOOK MANAGEMENT</span>
+
+            <h1>Edit Book ✏️</h1>
+
+            <p>Keep your book information up to date.</p>
+
+        </div>
+
+        <form th:action="@{/libro/{id}/editar(id=${libro.id})}"
+              th:object="${bookRequest}"
+              method="post">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <!-- Cover preview -->
+            <div class="book-edit-preview">
+
+                <img id="coverPreview"
+                     th:src="${libro.portadaUrl != null
+                         and !#strings.isEmpty(libro.portadaUrl)
+                         ? libro.portadaUrl
+                         : '/images/book/Default_fallback.jpg'}"
+                     alt="Book cover">
+
+            </div>
+
+            <!-- Title -->
+            <div class="auth-field">
+
+                <label for="titulo">Book Title</label>
+
+                <input type="text"
+                       id="titulo"
+                       th:field="*{titulo}"
+                       required>
+
+                <small class="field-error"
+                       th:errors="*{titulo}">
+                </small>
+
+            </div>
+
+            <!-- Author -->
+            <div class="auth-field">
+
+                <label for="autor">Author</label>
+
+                <input type="text"
+                       id="autor"
+                       th:field="*{autor}"
+                       required>
+
+                <small class="field-error"
+                       th:errors="*{autor}">
+                </small>
+
+            </div>
+
+            <!-- Cover URL -->
+            <div class="auth-field">
+
+                <label for="portadaUrl">Cover URL</label>
+
+                <input type="url"
+                       id="portadaUrl"
+                       th:field="*{portadaUrl}"
+                       placeholder="https://example.com/cover.jpg">
+
+                <small class="field-error"
+                       th:errors="*{portadaUrl}">
+                </small>
+
+            </div>
+
+            <!-- Year -->
+            <div class="auth-field">
+
+                <label for="anio">Publication Year</label>
+
+                <input type="number"
+                       id="anio"
+                       th:field="*{anio}"
+                       min="0"
+                       max="2026"
+                       required>
+
+                <small class="field-error"
+                       th:errors="*{anio}">
+                </small>
+
+            </div>
+
+            <!-- Genre -->
+            <div class="auth-field">
+
+                <label for="genero">Genre</label>
+
+                <input type="text"
+                       id="genero"
+                       th:field="*{genero}"
+                       placeholder="Fantasy, Romance, Mystery..."
+                       required>
+
+                <small class="field-error"
+                       th:errors="*{genero}">
+                </small>
+
+            </div>
+
+            <!-- Synopsis -->
+            <div class="auth-field">
+
+                <label for="sinopsis">Synopsis</label>
+
+                <textarea id="sinopsis"
+                          th:field="*{sinopsis}"
+                          rows="6"
+                          required>
+                </textarea>
+
+                <small class="field-error"
+                       th:errors="*{sinopsis}">
+                </small>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="book-edit-actions">
+
+                <button type="submit" class="btn-primary">
+                    Save Changes
+                </button>
+
+                <a th:href="@{/libro/{id}(id=${libro.id})}"
+                   class="btn-cancel">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const input = document.getElementById("portadaUrl");
+    const preview = document.getElementById("coverPreview");
+
+    input.addEventListener("input", function() {
+
+        preview.src = this.value.trim()
+            || "/images/book/Default_fallback.jpg";
+
+    });
+
+    preview.addEventListener("error", function() {
+
+        this.src = "/images/book/Default_fallback.jpg";
+
+    });
+
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(
+    'Book Details | BookHub',
+    'See all about your favorite book.'
+)}">
+</head>
+<body>
+
+  <!-- Header Fragment -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <main class="container book-detail-container">
+    <!-- Back Button -->
+    <div class="back-nav">
+      <a href="#" class="btn-back">← Back</a>
+    </div>
+
+    <!-- Main Book Info Grid (2 Columns: Wider Left, Right Cover/Stats) -->
+    <section class="book-main-grid">
+      <!-- Left Column: Publisher, Title, Metadata, CTA, Genres, Synopsis -->
+      <div class="book-info-left">
+        <!-- Publisher Info -->
+        <div class="publisher-meta">
+          <div class="publisher-avatar">📖</div>
+          <span th:text="${libro.autor}">
+            Author
+        </span>
+          <button class="btn-follow">Follow</button>
+        </div>
+
+        <!-- Book Title -->
+        <h1 class="book-title"
+            th:text="${libro.titulo}">
+            Book title
+        </h1>
+
+        <!-- Metadata (Release Date & Rating) -->
+        <div class="book-metadata">
+          <div class="meta-item">
+            <span class="meta-icon">📅</span>
+            <div>
+              <span class="meta-label">RELEASE DATE</span>
+              <span th:text="${libro.anio}">
+                  2026
+              </span>
+            </div>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">⭐</span>
+
+            <div>
+                <span class="meta-label">COMMUNITY RATING</span>
+
+                <span class="meta-value"
+                      th:text="${totalResenas != null and totalResenas > 0
+                          ? #numbers.formatDecimal(ratingPromedio, 1, 1)
+                          : 'No ratings'}">
+                    No ratings
+                </span>
+
+                <small th:text="${totalResenas != null
+                    ? totalResenas + (totalResenas == 1 ? ' review' : ' reviews')
+                    : '0 reviews'}">
+                    0 reviews
+                </small>
+            </div>
+        </div>
+        </div>
+
+        <!-- Read Now CTA -->
+        <div class="book-actions">
+
+            <button class="btn-primary btn-read-now">
+                Read now
+            </button>
+
+            <a th:if="${puedeEditarLibro}"
+            th:href="@{/libro/{id}/editar(id=${libro.id})}"
+            class="btn-edit-book">
+
+                ✏️ Edit Book
+
+            </a>
+
+        </div>
+
+        <!-- Genre Tags -->
+        <div class="book-tags">
+            <span class="tag"
+                th:text="${libro.genero}">
+                Genre
+            </span>
+        </div>
+
+        <!-- Synopsis -->
+        <p th:text="${libro.sinopsis}">
+            Book synopsis
+        </p>
+      </div>
+
+      <!-- Right Column: Front Page Cover & Stats Counter -->
+      <div class="book-info-right">
+        <img th:src="${libro.portadaUrl}"
+            th:alt="${libro.titulo}"
+            class="book-cover-large">
+        <div class="book-stats-bar"
+          th:attr="data-book-id=${libro.id}">
+
+          <!-- FAVORITES -->
+          <div class="stat-item">
+
+              <button type="button"
+                      id="favoriteButton"
+                      class="book-interaction-btn"
+                      th:if="${currentUser != null}"
+                      th:classappend="${esFavorito} ? ' active' : ''"
+                      th:attr="aria-pressed=${esFavorito}">
+
+                  <span id="favoriteIcon"
+                        th:text="${esFavorito} ? '❤️' : '🤍'">
+                      🤍
+                  </span>
+
+              </button>
+
+              <span th:if="${currentUser == null}">
+                  🤍
+              </span>
+
+              <span class="stat-num"
+                    id="favoriteCount"
+                    th:text="${totalFavoritos}">
+                  0
+              </span>
+
+          </div>
+
+          <!-- SAVED BOOKS -->
+          <div class="stat-item">
+
+              <button type="button"
+                      id="saveButton"
+                      class="book-interaction-btn"
+                      th:if="${currentUser != null}"
+                      th:classappend="${estaGuardado} ? ' active' : ''"
+                      th:attr="aria-pressed=${estaGuardado}">
+
+                  <span id="saveIcon"
+                        th:text="${estaGuardado} ? '🔖' : '📑'">
+                      📑
+                  </span>
+
+              </button>
+
+              <span th:if="${currentUser == null}">
+                  📑
+              </span>
+
+              <span class="stat-num"
+                    id="savedCount"
+                    th:text="${totalGuardados}">
+                  0
+              </span>
+
+          </div>
+
+      </div>
+      </div>
+    </section>
+
+    <!-- Reviews Section -->
+    
+    <section class="reviews-section"
+            id="reviewsSection"
+            th:attr="data-book-id=${libro.id}">
+
+        <h3 class="section-heading">Reviews & Community</h3>
+
+        <div class="reviews-grid">
+
+            <!-- LEFT: Community Reviews -->
+            <div class="community-reviews">
+
+                <h4>Community Reviews</h4>
+
+                <div id="communityReviewsList">
+
+                    <p class="reviews-loading">
+                        Loading community reviews...
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT: Write Review & Personal Reviews -->
+            <div class="my-reviews-column">
+
+                <!-- Authenticated users -->
+                <div th:if="${currentUser != null}">
+
+                    <h4>Write Your Review</h4>
+
+                    <form id="reviewForm" class="review-form">
+
+                        <!-- CSRF protection -->
+                        <input type="hidden"
+                              th:name="${_csrf.parameterName}"
+                              th:value="${_csrf.token}"
+                              id="csrfToken">
+
+                        <div class="auth-field">
+
+                            <label for="reviewRating">
+                                Your rating
+                            </label>
+
+                            <select id="reviewRating" required>
+                                <option value="">Select stars</option>
+                                <option value="5">★★★★★ - Excellent</option>
+                                <option value="4">★★★★ - Very good</option>
+                                <option value="3">★★★ - Good</option>
+                                <option value="2">★★ - Fair</option>
+                                <option value="1">★ - Poor</option>
+                            </select>
+
+                        </div>
+
+                        <textarea
+                            id="reviewComment"
+                            placeholder="What do you think about this book?..."
+                            rows="4"
+                            maxlength="2000">
+                        </textarea>
+
+                        <button type="submit"
+                                class="btn-primary btn-send-review">
+                            Send Review
+                        </button>
+
+                        <p id="reviewMessage"
+                          role="status"
+                          aria-live="polite">
+                        </p>
+
+                    </form>
+
+                    <div class="my-reviews-history">
+
+                        <h4>Your Reviews</h4>
+
+                        <div id="myReviewsList">
+
+                            <p class="reviews-loading">
+                                Loading your reviews...
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Visitors who aren't authenticated -->
+                <div th:if="${currentUser == null}"
+                    class="review-login-prompt">
+
+                    <h4>Share Your Thoughts</h4>
+
+                    <p>
+                        Enjoying this book? Let the community know
+                        what you think!
+                    </p>
+
+                    <p>
+                        You need an account to write reviews,
+                        rate books and share your reading experience.
+                    </p>
+
+                    <a th:href="@{/login}"
+                      class="btn-primary">
+                        Sign in to write a review
+                    </a>
+
+                    <p class="register-prompt">
+                        Don't have an account?
+                        <a th:href="@{/register}">Join BookHub</a>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation Fragment / Markup -->
+  <nav class="bottom-nav">
+    <a th:href="@{/}" class="nav-item">
+      <span class="nav-icon">🏠</span>
+      <span>Home</span>
+    </a>
+    <a th:href="@{/library}" class="nav-item">
+      <span class="nav-icon">📚</span>
+      <span>Library</span>
+    </a>
+    <a th:href="@{/explorar}" class="nav-item">
+      <span class="nav-icon">🚀</span>
+      <span>Explore</span>
+    </a>
+    <a th:href="@{/search}" class="nav-item">
+      <span class="nav-icon">🔍</span>
+      <span>Search</span>
+    </a>
+  </nav>
+
+  <!-- Footer Fragment -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/reviews.js}" defer></script>
+    <script th:src="@{/js/book-interactions.js}" defer></script>
+
+</body>
+</html>
