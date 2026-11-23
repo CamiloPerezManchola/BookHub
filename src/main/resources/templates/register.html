@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
 <head th:replace="~{fragments/head :: head(
     'Register | BookHub',
     'Create your BookHub account and start your reading journey.'
@@ -16,82 +16,140 @@
         <div class="auth-card">
 
             <!-- Branding -->
-            <a th:href="@{/}" class="auth-logo">
+            <a th:href="@{\/}" class="auth-logo">
                 <div class="logo-placeholder">📖</div>
                 <span class="brand-name">Bookhub</span>
             </a>
 
             <!-- Heading -->
             <div class="auth-heading">
-                <h1>Join BookHub!</h1>
-                <p>Create your account and start your reading journey.</p>
+                <h1 th:text="#{register.title}">
+                    Join BookHub!
+                </h1>
+
+                <p th:text="#{register.subtitle}">
+                    Create your account and start your reading journey.
+                </p>
             </div>
 
-            <!-- Error -->
+            <!-- Server Error -->
             <div class="auth-alert"
                  th:if="${error}"
                  th:text="${error}">
             </div>
 
+            <!-- Client-side Error -->
+            <div class="auth-alert"
+                 id="registerClientError"
+                 role="alert"
+                 hidden>
+            </div>
+
             <!-- Registration Form -->
             <form th:action="@{/api/users/register}"
-                method="post"
-                class="auth-form"
-                id="registerForm">
+                  method="post"
+                  class="auth-form"
+                  id="registerForm"
+                  novalidate
+
+                  th:data-password-mismatch="#{register.js.passwordMismatch}"
+                  th:data-security-error="#{register.js.securityError}"
+                  th:data-registration-error="#{register.js.registrationError}"
+                  th:data-required="#{register.js.required}"
+                  th:data-invalid-email="#{register.js.invalidEmail}"
+                  th:data-min-length="#{register.js.minLength}"
+                  th:data-registration-failed="#{register.js.registrationFailed}">
 
                 <!-- CSRF protection -->
                 <input type="hidden"
-                    th:name="${_csrf.parameterName}"
-                    th:value="${_csrf.token}">
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
 
                 <!-- Full name -->
                 <div class="auth-field">
-                    <label for="nombre">Full name</label>
+
+                    <label for="nombre"
+                           th:text="#{register.name.label}">
+                        Full name
+                    </label>
+
                     <input type="text"
-                        id="nombre"
-                        name="nombre"
-                        required>
+                           id="nombre"
+                           name="nombre"
+                           th:placeholder="#{register.name.placeholder}"
+                           autocomplete="name"
+                           required>
                 </div>
 
                 <!-- Username -->
                 <div class="auth-field">
-                    <label for="username">Username</label>
+
+                    <label for="username"
+                           th:text="#{register.username.label}">
+                        Username
+                    </label>
+
                     <input type="text"
-                        id="username"
-                        name="username"
-                        required>
+                           id="username"
+                           name="username"
+                           th:placeholder="#{register.username.placeholder}"
+                           autocomplete="username"
+                           required>
                 </div>
 
                 <!-- Email -->
                 <div class="auth-field">
-                    <label for="email">Email address</label>
+
+                    <label for="email"
+                           th:text="#{register.email.label}">
+                        Email address
+                    </label>
+
                     <input type="email"
-                        id="email"
-                        name="email"
-                        required>
+                           id="email"
+                           name="email"
+                           th:placeholder="#{register.email.placeholder}"
+                           autocomplete="email"
+                           required>
                 </div>
 
                 <!-- Password -->
                 <div class="auth-field">
-                    <label for="password">Password</label>
+
+                    <label for="password"
+                           th:text="#{register.password.label}">
+                        Password
+                    </label>
+
                     <input type="password"
-                        id="password"
-                        name="password"
-                        minlength="8"
-                        required>
+                           id="password"
+                           name="password"
+                           th:placeholder="#{register.password.placeholder}"
+                           minlength="8"
+                           autocomplete="new-password"
+                           required>
                 </div>
 
                 <!-- Confirm password -->
                 <div class="auth-field">
-                    <label for="confirmPassword">Confirm password</label>
+
+                    <label for="confirmPassword"
+                           th:text="#{register.confirmPassword.label}">
+                        Confirm password
+                    </label>
+
                     <input type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        minlength="8"
-                        required>
+                           id="confirmPassword"
+                           name="confirmPassword"
+                           th:placeholder="#{register.confirmPassword.placeholder}"
+                           minlength="8"
+                           autocomplete="new-password"
+                           required>
                 </div>
 
-                <button type="submit" class="btn-primary auth-submit">
+                <button type="submit"
+                        class="btn-primary auth-submit"
+                        th:text="#{register.submit}">
                     Create Account
                 </button>
 
@@ -100,12 +158,20 @@
             <!-- Login Link -->
             <div class="auth-footer">
                 <p>
-                    Already have an account?
-                    <a th:href="@{/login}">Sign in</a>
+                    <span th:text="#{register.haveAccount}">
+                        Already have an account?
+                    </span>
+
+                    <a th:href="@{/login}"
+                       th:text="#{register.signIn}">
+                        Sign in
+                    </a>
                 </p>
             </div>
 
-            <a th:href="@{/}" class="auth-back">
+            <a th:href="@{\/}"
+               class="auth-back"
+               th:text="#{register.backHome}">
                 ← Back to home
             </a>
 

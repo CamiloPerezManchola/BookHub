@@ -1,11 +1,13 @@
-
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
+
 <head th:replace="~{fragments/head :: head(
-    'Error | BookHub',
-    'Something went wrong on BookHub.'
+    #{error.page.title},
+    #{error.page.description}
 )}">
 </head>
+
 <body>
 
     <main class="error-container">
@@ -29,29 +31,42 @@
                 404
             </span>
 
-            <h1 th:text="${status == 404 ? 'Page not found' : 'Oops! Something went wrong.'}">
+            <h1 th:text="${status == 404
+                ? #{error.notFound.title}
+                : #{error.generic.title}}">
                 Page not found
             </h1>
 
             <p class="error-description"
-               th:text="${message != null ? message : 'The page you are looking for does not exist or may have been moved.'}">
-                The page you are looking for does not exist or may have been moved.
+               th:text="${message != null
+                ? message
+                : (status == 404
+                    ? #{error.notFound.description}
+                    : #{error.generic.description})}">
+                The page you are looking for does not exist
+                or may have been moved.
             </p>
 
             <!-- Actions -->
             <div class="error-actions">
-                <a th:href="@{/}" class="btn-primary">
+
+                <a th:href="@{/}"
+                   class="btn-primary"
+                   th:text="#{error.action.home}">
                     Go to homepage
                 </a>
 
                 <button type="button"
                         class="btn-error-secondary"
-                        onclick="history.back()">
+                        onclick="history.back()"
+                        th:text="#{error.action.back}">
                     Go back
                 </button>
+
             </div>
 
-            <p class="error-footer">
+            <p class="error-footer"
+               th:text="#{error.footer}">
                 Need help? We're always happy to help fellow readers.
             </p>
 

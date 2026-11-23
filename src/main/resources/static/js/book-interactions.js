@@ -6,6 +6,12 @@ $(document).ready(function () {
 
     const csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
+    const translations = document.getElementById("reviewTranslations");
+
+    function t(key) {
+        return translations?.dataset[key] || key;
+    }
+
     function updateInteraction(url, button, icon, counter, activeIcon, inactiveIcon) {
 
         $.ajax({
@@ -34,9 +40,9 @@ $(document).ready(function () {
             error: function (xhr) {
 
                 if (xhr.status === 401 || xhr.status === 403) {
-                    alert("Please log in to perform this action.");
+                    alert(t("loginRequired"));
                 } else {
-                    alert("Something went wrong. Please try again.");
+                    alert(t("tryAgain"));
                 }
 
             }

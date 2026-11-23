@@ -11,6 +11,8 @@ public class UserResponse {
 
     private String nombre;
 
+    private String username;
+
     private String email;
 
     private String descripcion;

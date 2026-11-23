@@ -1,8 +1,12 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const tabs = document.querySelectorAll(".library-tab");
     const panels = document.querySelectorAll(".library-panel");
+
+    if (!tabs.length || !panels.length) {
+        console.error("Library tabs or panels were not found.");
+        return;
+    }
 
     function activateTab(tab) {
 
@@ -13,20 +17,32 @@ document.addEventListener("DOMContentLoaded", function () {
             const active = item === tab;
 
             item.classList.toggle("active", active);
-            item.setAttribute("aria-selected", active);
-            item.setAttribute("tabindex", active ? "0" : "-1");
+
+            item.setAttribute(
+                "aria-selected",
+                String(active)
+            );
+
+            item.setAttribute(
+                "tabindex",
+                active ? "0" : "-1"
+            );
 
         });
 
         panels.forEach(function (panel) {
 
-            panel.hidden = panel.id !== "panel-" + selectedTab;
+            const active =
+                panel.id === "panel-" + selectedTab;
+
+            panel.hidden = !active;
+            panel.classList.toggle("active", active);
 
         });
 
     }
 
-    tabs.forEach(function (tab, index) {
+    tabs.forEach(function (tab) {
 
         tab.addEventListener("click", function () {
             activateTab(tab);
@@ -34,14 +50,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tab.addEventListener("keydown", function (event) {
 
-            let nextIndex = index;
+            const currentIndex = Array.from(tabs).indexOf(tab);
 
-            if (event.key === "ArrowRight") {
-                nextIndex = (index + 1) % tabs.length;
-            } else if (event.key === "ArrowLeft") {
-                nextIndex = (index - 1 + tabs.length) % tabs.length;
-            } else {
-                return;
+            let nextIndex;
+
+            switch (event.key) {
+
+                case "ArrowRight":
+                    nextIndex = (currentIndex + 1) % tabs.length;
+                    break;
+
+                case "ArrowLeft":
+                    nextIndex =
+                        (currentIndex - 1 + tabs.length) % tabs.length;
+                    break;
+
+                case "Home":
+                    nextIndex = 0;
+                    break;
+
+                case "End":
+                    nextIndex = tabs.length - 1;
+                    break;
+
+                default:
+                    return;
             }
 
             event.preventDefault();
@@ -52,5 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     });
+
+    // Initialize the published tab
+    const initialTab =
+        document.querySelector(".library-tab.active") || tabs[0];
+
+    activateTab(initialTab);
 
 });

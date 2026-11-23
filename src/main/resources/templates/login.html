@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
 <head th:replace="~{fragments/head :: head(
     'Login | BookHub',
     'Login to your BookHub account.'
@@ -20,16 +20,23 @@
 
             <!-- Heading -->
             <div class="auth-heading">
-                <h1>Welcome back!</h1>
-                <p>Sign in to continue your reading journey.</p>
+                <h1 th:text="#{login.title}">
+                    Welcome back!
+                </h1>
+
+                <p th:text="#{login.subtitle}">
+                    Sign in to continue your reading journey.
+                </p>
             </div>
 
             <!-- Error message -->
-            <div class="auth-alert" th:if="${param.error}">
+            <div class="auth-alert" th:if="${param.error}"
+                 th:text="#{login.error}">
                 Invalid username/email or password. Please try again.
             </div>
 
-            <div class="auth-alert success" th:if="${param.logout}">
+            <div class="auth-alert success" th:if="${param.logout}"
+                 th:text="#{login.logout}">
                 You have successfully logged out.
             </div>
 
@@ -37,43 +44,42 @@
             <form th:action="@{/login}" method="post" class="auth-form">
 
                 <input type="hidden"
-                    th:name="${_csrf.parameterName}"
-                    th:value="${_csrf.token}">
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
 
                 <div class="auth-field">
-                    <label for="identifier">Username or Email</label>
 
-                    <input type="text"
-                        id="identifier"
-                        name="identifier"
-                        placeholder="Enter your username or email"
-                        autocomplete="username"
-                        required>
-                </div>
-
-                <div class="auth-field">
-                    <label for="password">Password</label>
-
-                    <input type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        autocomplete="current-password"
-                        required>
-                </div>
-
-                <div class="auth-options">
-                    <label class="remember-me">
-                        <input type="checkbox" name="remember-me">
-                        Remember me
+                    <label for="identifier"
+                           th:text="#{login.identifier.label}">
+                        Username or Email
                     </label>
 
-                    <a th:href="@{/forgot-password}">
-                        Forgot password?
-                    </a>
+                    <input type="text"
+                           id="identifier"
+                           name="identifier"
+                           th:placeholder="#{login.identifier.placeholder}"
+                           autocomplete="username"
+                           required>
                 </div>
 
-                <button type="submit" class="btn-primary auth-submit">
+                <div class="auth-field">
+
+                    <label for="password"
+                           th:text="#{login.password.label}">
+                        Password
+                    </label>
+
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           th:placeholder="#{login.password.placeholder}"
+                           autocomplete="current-password"
+                           required>
+                </div>
+
+                <button type="submit"
+                        class="btn-primary auth-submit"
+                        th:text="#{login.submit}">
                     Sign In
                 </button>
 
@@ -82,12 +88,20 @@
             <!-- Registration Link -->
             <div class="auth-footer">
                 <p>
-                    Don't have an account?
-                    <a th:href="@{/register}">Create one</a>
+                    <span th:text="#{login.noAccount}">
+                        Don't have an account?
+                    </span>
+
+                    <a th:href="@{/register}"
+                       th:text="#{login.createAccount}">
+                        Create one
+                    </a>
                 </p>
             </div>
 
-            <a th:href="@{/}" class="auth-back">
+            <a th:href="@{/}"
+               class="auth-back"
+               th:text="#{login.backHome}">
                 ← Back to home
             </a>
 

@@ -2,7 +2,6 @@ package usco.edu.co.BookHub.controller;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -33,8 +32,11 @@ public class GlobalModelAdvice {
         }
 
         User user = userRepository
-                .findByEmail(authentication.getName())
-                .orElse(null);
+            .findByUsernameIgnoreCaseOrEmailIgnoreCase(
+                authentication.getName(),
+                authentication.getName()
+            )
+            .orElse(null);
 
         if (user == null) {
             return null;

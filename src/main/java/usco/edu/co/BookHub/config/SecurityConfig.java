@@ -56,7 +56,8 @@ public class SecurityConfig {
                 "/login",
                 "/register",
                 "/explorar",
-                "/libro/*"
+                "/libro/*",
+                "/libro/*/leer"
             ).permitAll()
 
             // Static resources
@@ -65,6 +66,11 @@ public class SecurityConfig {
                 "/js/**",
                 "/images/**",
                 "/webjars/**"
+            ).permitAll()
+
+            .requestMatchers(
+                org.springframework.http.HttpMethod.GET,
+                "/api/books/*/chapters"
             ).permitAll()
 
             // Public registration
@@ -85,8 +91,23 @@ public class SecurityConfig {
             ).hasRole("ADMIN")
 
             .requestMatchers(
+                org.springframework.http.HttpMethod.PUT,
+                "/api/users/*"
+            ).hasRole("ADMIN")
+
+            .requestMatchers(
                 org.springframework.http.HttpMethod.DELETE,
                 "/api/users/*"
+            ).hasRole("ADMIN")
+
+            .requestMatchers(
+                org.springframework.http.HttpMethod.GET,
+                "/api/admin/reviews"
+            ).hasRole("ADMIN")
+
+            .requestMatchers(
+                org.springframework.http.HttpMethod.DELETE,
+                "/api/admin/reviews/*"
             ).hasRole("ADMIN")
 
             // Public book reading
@@ -141,6 +162,22 @@ public class SecurityConfig {
                 "/crear-libro",
                 "/libro/*/editar"
             ).authenticated()
+
+            // Reading progress - authenticated users
+            .requestMatchers(
+                "/api/books/*/progress"
+            ).authenticated()
+
+            // Chapter bookmarks - authenticated users
+            .requestMatchers(
+                "/api/books/*/bookmarks",
+                "/api/books/*/bookmarks/*"
+            ).authenticated()
+
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+
+            // ADMIN review management
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
             .anyRequest().authenticated()
         )

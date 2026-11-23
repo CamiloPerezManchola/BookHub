@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
 
 <head th:replace="~{fragments/head :: head(
     'Edit Profile | BookHub',
@@ -17,11 +18,17 @@
 
         <div class="profile-edit-heading">
 
-            <span>YOUR ACCOUNT</span>
+            <span th:text="#{profile.edit.eyebrow}">
+                YOUR ACCOUNT
+            </span>
 
-            <h1>Edit Profile</h1>
+            <h1 th:text="#{profile.edit.title}">
+                Edit Profile
+            </h1>
 
-            <p>Make your BookHub profile yours.</p>
+            <p th:text="#{profile.edit.subtitle}">
+                Make your BookHub profile yours.
+            </p>
 
         </div>
 
@@ -48,20 +55,22 @@
                          and !#strings.isEmpty(perfil.fotoPerfilUrl)
                          ? perfil.fotoPerfilUrl
                          : '/images/default-avatar.png'}"
-                     alt="Profile picture">
+                     th:alt="#{profile.edit.imageAlt}">
 
             </div>
 
+            <!-- Profile picture URL -->
             <div class="auth-field">
 
-                <label for="fotoPerfilUrl">
+                <label for="fotoPerfilUrl"
+                       th:text="#{profile.edit.photoUrl}">
                     Profile Picture URL
                 </label>
 
                 <input type="url"
                        id="fotoPerfilUrl"
                        th:field="*{fotoPerfilUrl}"
-                       placeholder="https://example.com/avatar.jpg">
+                       th:placeholder="#{profile.edit.photoPlaceholder}">
 
                 <small class="field-error"
                        th:errors="*{fotoPerfilUrl}">
@@ -72,7 +81,10 @@
             <!-- Name -->
             <div class="auth-field">
 
-                <label for="nombre">Display Name</label>
+                <label for="nombre"
+                       th:text="#{profile.edit.name}">
+                    Display Name
+                </label>
 
                 <input type="text"
                        id="nombre"
@@ -89,27 +101,35 @@
             <!-- Email (read only) -->
             <div class="auth-field">
 
-                <label for="email">Email</label>
+                <label for="email"
+                       th:text="#{profile.edit.email}">
+                    Email
+                </label>
 
                 <input type="email"
                        id="email"
                        th:value="${perfil.email}"
                        readonly>
 
-                <small>Email cannot be changed here.</small>
+                <small th:text="#{profile.edit.emailHelp}">
+                    Email cannot be changed here.
+                </small>
 
             </div>
 
             <!-- Description -->
             <div class="auth-field">
 
-                <label for="descripcion">About Me</label>
+                <label for="descripcion"
+                       th:text="#{profile.edit.about}">
+                    About Me
+                </label>
 
                 <textarea id="descripcion"
                           th:field="*{descripcion}"
                           rows="4"
                           maxlength="500"
-                          placeholder="Tell the community something about yourself...">
+                          th:placeholder="#{profile.edit.aboutPlaceholder}">
                 </textarea>
 
                 <small class="field-error"
@@ -118,14 +138,18 @@
 
             </div>
 
+            <!-- Actions -->
             <div class="profile-edit-actions">
 
-                <button type="submit" class="btn-primary">
+                <button type="submit"
+                        class="btn-primary"
+                        th:text="#{profile.edit.save}">
                     Save Changes
                 </button>
 
                 <a th:href="@{/mibiblioteca}"
-                   class="btn-cancel">
+                   class="btn-cancel"
+                   th:text="#{profile.edit.cancel}">
                     Cancel
                 </a>
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import usco.edu.co.BookHub.dto.request.AdminUpdateUserRequest;
 import usco.edu.co.BookHub.dto.request.RegisterRequest;
 import usco.edu.co.BookHub.dto.request.UpdateProfileRequest;
 import usco.edu.co.BookHub.dto.response.UserResponse;
@@ -96,5 +97,20 @@ public class UserController {
         User currentUser = obtenerUsuarioActual(principal);
 
         userService.eliminar(id, currentUser);
+    }
+
+    @PutMapping("/{id}")
+    public UserResponse actualizarUsuario(
+            @PathVariable Long id,
+            @Valid @RequestBody AdminUpdateUserRequest request,
+            @AuthenticationPrincipal UserDetails principal) {
+
+        User currentUser = obtenerUsuarioActual(principal);
+
+        return userService.actualizarUsuario(
+            id,
+            request,
+            currentUser
+        );
     }
 }

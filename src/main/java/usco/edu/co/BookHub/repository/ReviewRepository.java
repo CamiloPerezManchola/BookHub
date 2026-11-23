@@ -35,10 +35,20 @@ public interface ReviewRepository
     List<Object[]> findAverageRatings();
 
     @Query("""
+        SELECT AVG(r.rating)
+        FROM Review r
+        WHERE r.user.id = :userId
+    """)
+    Double calculateUserAverageRating(
+        @Param("userId") Long userId
+    );
+
+    @Query("""
         SELECT COUNT(r)
         FROM Review r
         WHERE r.book.id = :bookId
     """)
     Long countReviewsByBookId(@Param("bookId") Long bookId);
-    
+
+    void deleteByBook_Id(Long bookId);
 }

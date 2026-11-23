@@ -13,24 +13,52 @@
     <div class="header-right">
 
         <!-- Search -->
-        
-        <form th:action="@{/explorar}" method="get" class="search-box">
+        <form th:action="@{/explorar}"
+              method="get"
+              class="search-box">
+
             <span class="search-icon">🔍</span>
 
             <input type="search"
-                name="q"
-                placeholder="Search books..."
-                aria-label="Search books">
+                   name="q"
+                   th:placeholder="#{header.search}"
+                   th:attr="aria-label=#{header.search}"
+                   placeholder="Buscar libros...">
 
-            <span class="kbd-shortcut">⌘ K</span>
+            <span class="kbd-shortcut">➤</span>
         </form>
 
+        <!-- Language selector -->
+        <div class="language-selector">
+
+            <select id="languageSelect"
+                    aria-label="Select language">
+
+                <option value="es"
+                        th:selected="${#locale.language == 'es'}">
+                    🇪🇸 Español
+                </option>
+
+                <option value="en"
+                        th:selected="${#locale.language == 'en'}">
+                    🇬🇧 English
+                </option>
+
+                <option value="it"
+                        th:selected="${#locale.language == 'it'}">
+                    🇮🇹 Italiano
+                </option>
+
+            </select>
+
+        </div>
 
         <!-- Logged out -->
         <a th:if="${currentUser == null}"
            th:href="@{/login}"
-           class="btn-login">
-            Login
+           class="btn-login"
+           th:text="#{nav.login}">
+            Iniciar sesión
         </a>
 
         <!-- Logged in -->
@@ -60,35 +88,40 @@
 
             </summary>
 
-            
             <div class="profile-menu">
 
                 <a th:href="@{/mibiblioteca}">
                     <span>📚</span>
-                    My Library
+                    <span th:text="#{nav.library}">Mi biblioteca</span>
+                </a>
+
+                <a th:href="@{/estadisticas}">
+                    <span>📊</span>
+                    <span th:text="#{nav.statistics}">Estadísticas</span>
                 </a>
 
                 <a th:href="@{/perfil/editar}">
                     <span>✏️</span>
-                    Edit Profile
+                    <span th:text="#{nav.editProfile}">Editar perfil</span>
                 </a>
 
                 <a th:href="@{/crear-libro}"
-                    class="btn-primary">
-                    + Publish a Book
+                   class="btn-primary">
+                    + <span th:text="#{nav.publishBook}">Publicar un libro</span>
                 </a>
 
                 <div class="profile-menu-divider"></div>
 
                 <form th:action="@{/logout}" method="post">
+
                     <button type="submit" class="logout-option">
                         <span>↪</span>
-                        Log out
+                        <span th:text="#{nav.logout}">Cerrar sesión</span>
                     </button>
+
                 </form>
 
             </div>
-
 
         </details>
 

@@ -22,4 +22,8 @@ public class ReviewResponse {
     private String nombre;
 
     private String fotoPerfilUrl;
+
+    private Long bookId;
+
+    private String bookTitle;
 }

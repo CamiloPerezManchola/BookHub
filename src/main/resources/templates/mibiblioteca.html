@@ -1,7 +1,6 @@
-
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
 <head th:replace="~{fragments/head :: head(
     'My Library | BookHub',
     'Manage your personal book collection.'
@@ -19,19 +18,23 @@
         <section class="library-heading">
 
             <div>
-                <span class="library-eyebrow">
+                <span class="library-eyebrow"
+                    th:text="#{library.eyebrow}">
                     YOUR PERSONAL SPACE
                 </span>
 
-                <h1>My Library 📚</h1>
+                <h1 th:text="#{library.title}">
+                    My Library 📚
+                </h1>
 
-                <p>
+                <p th:text="#{library.subtitle}">
                     Your books, your stories, your journey.
                 </p>
             </div>
 
             <a th:href="@{/crear-libro}"
-               class="btn-primary">
+            class="btn-primary"
+            th:text="#{library.publish}">
                 + Publish a Book
             </a>
 
@@ -41,10 +44,10 @@
         <section class="library-tabs-section">
 
             <div class="library-tabs"
-                 role="tablist"
-                 aria-label="My book collections">
+                role="tablist"
+                th:attr="aria-label=#{library.tabsLabel}">
 
-                <!-- Published -->
+                <!-- PUBLISHED -->
                 <button type="button"
                         class="library-tab active"
                         id="tab-published"
@@ -54,16 +57,14 @@
                         aria-controls="panel-published">
 
                     <span>📚</span>
-                    <span>Published</span>
+                    <span th:text="#{library.published}">Published</span>
 
                     <span class="tab-count"
-                          th:text="${totalPublicados}">
-                        0
-                    </span>
+                        th:text="${totalPublicados}">0</span>
 
                 </button>
 
-                <!-- Favorites -->
+                <!-- FAVORITES -->
                 <button type="button"
                         class="library-tab"
                         id="tab-favorites"
@@ -73,16 +74,14 @@
                         aria-controls="panel-favorites">
 
                     <span>❤️</span>
-                    <span>Favorites</span>
+                    <span th:text="#{library.favorites}">Favorites</span>
 
                     <span class="tab-count"
-                          th:text="${totalFavoritos}">
-                        0
-                    </span>
+                        th:text="${totalFavoritos}">0</span>
 
                 </button>
 
-                <!-- Saved -->
+                <!-- SAVED -->
                 <button type="button"
                         class="library-tab"
                         id="tab-saved"
@@ -92,12 +91,44 @@
                         aria-controls="panel-saved">
 
                     <span>🔖</span>
-                    <span>Saved</span>
+                    <span th:text="#{library.saved}">Saved</span>
 
                     <span class="tab-count"
-                          th:text="${totalGuardados}">
-                        0
-                    </span>
+                        th:text="${totalGuardados}">0</span>
+
+                </button>
+
+                <!-- READING -->
+                <button type="button"
+                        class="library-tab"
+                        id="tab-reading"
+                        data-tab="reading"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-reading">
+
+                    <span>📖</span>
+                    <span th:text="#{library.reading}">Reading</span>
+
+                    <span class="tab-count"
+                        th:text="${totalLeyendo}">0</span>
+
+                </button>
+
+                <!-- COMPLETED -->
+                <button type="button"
+                        class="library-tab"
+                        id="tab-completed"
+                        data-tab="completed"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="panel-completed">
+
+                    <span>🏆</span>
+                    <span th:text="#{library.completed}">Completed</span>
+
+                    <span class="tab-count"
+                        th:text="${totalCompletados}">0</span>
 
                 </button>
 
@@ -116,8 +147,13 @@
                     <div class="library-panel-heading">
 
                         <div>
-                            <h2>Your Published Books</h2>
-                            <p>Books you've shared with the BookHub community.</p>
+                            <h2 th:text="#{library.publishedHeading}">
+                                Your Published Books
+                            </h2>
+
+                            <p th:text="#{library.publishedDescription}">
+                                Books you've shared with the BookHub community.
+                            </p>
                         </div>
 
                     </div>
@@ -146,20 +182,21 @@
                                     Author
                                 </p>
 
-                                <span class="library-book-tag">
+                                <span class="library-book-tag"
+                                    th:text="#{library.publishedTag}">
                                     📚 Published
                                 </span>
 
                                 <a th:href="@{/libro/{id}(id=${libro.id})}"
-                                   class="btn-primary">
+                                class="btn-primary"
+                                th:text="#{library.viewBook}">
                                     View Book
                                 </a>
-                                
+
                                 <a th:href="@{/libro/{id}/editar(id=${libro.id})}"
-                                class="btn-edit-book">
-
+                                class="btn-edit-book"
+                                th:text="#{library.editBook}">
                                     ✏️ Edit
-
                                 </a>
 
                             </div>
@@ -169,22 +206,25 @@
                     </div>
 
                     <div class="library-empty"
-                         th:if="${publicados.isEmpty()}">
+                    th:if="${publicados.isEmpty()}">
 
-                        <div class="empty-library-icon">📚</div>
+                    <div class="empty-library-icon">📚</div>
 
-                        <h2>No published books yet</h2>
+                    <h2 th:text="#{library.noPublished}">
+                        No published books yet
+                    </h2>
 
-                        <p>
-                            Share your first book with the BookHub community!
-                        </p>
+                    <p th:text="#{library.noPublishedDescription}">
+                        Share your first book with the BookHub community!
+                    </p>
 
-                        <a th:href="@{/crear-libro}"
-                           class="btn-primary">
-                            Publish a Book
-                        </a>
+                    <a th:href="@{/crear-libro}"
+                    class="btn-primary"
+                    th:text="#{library.publish}">
+                        Publish a Book
+                    </a>
 
-                    </div>
+                </div>
 
                 </section>
 
@@ -199,8 +239,13 @@
                     <div class="library-panel-heading">
 
                         <div>
-                            <h2>Your Favorites ❤️</h2>
-                            <p>Books that captured your heart.</p>
+                            <h2 th:text="#{library.favoritesHeading}">
+                                Your Favorites ❤️
+                            </h2>
+
+                            <p th:text="#{library.favoritesDescription}">
+                                Books that captured your heart.
+                            </p>
                         </div>
 
                     </div>
@@ -245,22 +290,25 @@
                     </div>
 
                     <div class="library-empty"
-                         th:if="${favoritos.isEmpty()}">
+                    th:if="${favoritos.isEmpty()}">
 
-                        <div class="empty-library-icon">❤️</div>
+                    <div class="empty-library-icon">❤️</div>
 
-                        <h2>No favorites yet</h2>
+                    <h2 th:text="#{library.noFavorites}">
+                        No favorites yet
+                    </h2>
 
-                        <p>
-                            Find books you love and add them to your favorites.
-                        </p>
+                    <p th:text="#{library.noFavoritesDescription}">
+                        Find books you love and add them to your favorites.
+                    </p>
 
-                        <a th:href="@{/explorar}"
-                           class="btn-primary">
-                            Explore Books
-                        </a>
+                    <a th:href="@{/explorar}"
+                    class="btn-primary"
+                    th:text="#{library.exploreBooks}">
+                        Explore Books
+                    </a>
 
-                    </div>
+                </div>
 
                 </section>
 
@@ -275,8 +323,13 @@
                     <div class="library-panel-heading">
 
                         <div>
-                            <h2>Your Reading List 🔖</h2>
-                            <p>Books waiting for their moment.</p>
+                            <h2 th:text="#{library.savedHeading}">
+                                Your Reading List 🔖
+                            </h2>
+
+                            <p th:text="#{library.savedDescription}">
+                                Books waiting for their moment.
+                            </p>
                         </div>
 
                     </div>
@@ -305,12 +358,14 @@
                                     Author
                                 </p>
 
-                                <span class="library-book-tag">
+                                <span class="library-book-tag"
+                                    th:text="#{library.savedTag}">
                                     🔖 Saved
                                 </span>
 
                                 <a th:href="@{/libro/{id}(id=${libro.id})}"
-                                   class="btn-primary">
+                                class="btn-primary"
+                                th:text="#{library.viewBook}">
                                     View Book
                                 </a>
 
@@ -321,19 +376,232 @@
                     </div>
 
                     <div class="library-empty"
-                         th:if="${librosGuardados.isEmpty()}">
+                    th:if="${librosGuardados.isEmpty()}">
 
-                        <div class="empty-library-icon">🔖</div>
+                    <div class="empty-library-icon">🔖</div>
 
-                        <h2>Your reading list is empty</h2>
+                    <h2 th:text="#{library.noSaved}">
+                        Your reading list is empty
+                    </h2>
 
-                        <p>
-                            Save books you want to read later.
+                    <p th:text="#{library.noSavedDescription}">
+                        Save books you want to read later.
+                    </p>
+
+                    <a th:href="@{/explorar}"
+                    class="btn-primary"
+                    th:text="#{library.exploreBooks}">
+                        Explore Books
+                    </a>
+
+                </div>
+
+                </section>
+
+                <!-- CURRENTLY READING -->
+                <section id="panel-reading"
+                        class="library-panel"
+                        role="tabpanel"
+                        aria-labelledby="tab-reading"
+                        hidden>
+
+                    <div class="library-panel-heading">
+                        <div>
+                            <span class="library-book-tag"
+                                th:text="#{library.readingTag}">
+                                📖 Currently Reading
+                            </span>
+
+                            <p th:text="#{library.readingDescription}">
+                                Pick up where your last reading session ended.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="library-books-grid"
+                        th:if="${!actualmenteLeyendo.isEmpty()}">
+
+                        <article class="library-book-card"
+                                th:each="lectura : ${actualmenteLeyendo}">
+
+                            <a th:href="@{/libro/{id}(id=${lectura.bookId})}">
+                                <img th:src="${lectura.portadaUrl}"
+                                    th:alt="${lectura.titulo}"
+                                    class="library-book-cover">
+                            </a>
+
+                            <div class="library-book-info">
+
+                                <h3 th:text="${lectura.titulo}">
+                                    Book title
+                                </h3>
+
+                                <p th:text="${lectura.autor}">
+                                    Author
+                                </p>
+
+                                <span class="library-book-tag"
+                                    th:text="#{library.readingTag}">
+                                    📖 Currently Reading
+                                </span>
+
+                                <div class="reading-progress-info">
+
+                                    <div class="reading-progress-label">
+                                        <span th:text="#{library.readingProgress}">
+                                            Reading progress
+                                        </span>
+
+                                        <strong th:text="${#numbers.formatDecimal(
+                                            lectura.progressPercentage, 1, 0
+                                        ) + '%'}">
+                                            0%
+                                        </strong>
+                                    </div>
+
+                                    <div class="reading-progress-track">
+                                        <div class="reading-progress-fill"
+                                            th:style="'width:' + ${lectura.progressPercentage} + '%'">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <p class="reading-chapter"
+                                th:text="#{library.lastChapter(
+                                    lectura.chapterNumber,
+                                    lectura.chapterTitle
+                                )}">
+                                    Last chapter
+                                </p>
+
+                                <a th:href="@{/libro/{id}(id=${lectura.bookId})}"
+                                    class="btn-primary"
+                                    th:text="#{library.continueReading}">
+                                    Continue Reading →
+                                </a>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                    <div class="library-empty"
+                        th:if="${actualmenteLeyendo.isEmpty()}">
+
+                        <div class="empty-library-icon">📖</div>
+
+                        <h2 th:text="#{library.noReading}">
+                            No books in progress
+                        </h2>
+
+                        <p th:text="#{library.noReadingDescription}">
+                            Start reading a book and your progress will appear here.
                         </p>
 
                         <a th:href="@{/explorar}"
-                           class="btn-primary">
-                            Explore Books
+                        class="btn-primary"
+                        th:text="#{library.discoverBooks}">
+                            Discover Books
+                        </a>
+
+                    </div>
+
+                </section>
+
+                <!-- COMPLETED BOOKS -->
+                <section id="panel-completed"
+                        class="library-panel"
+                        role="tabpanel"
+                        aria-labelledby="tab-completed"
+                        hidden>
+
+                    <div class="library-panel-heading">
+                        <div>
+                            <h2 th:text="#{library.completedHeading}">
+                                Completed Books 🏆
+                            </h2>
+
+                            <p th:text="#{library.completedDescription}">
+                                Every finished book is another journey completed.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="library-books-grid"
+                        th:if="${!completados.isEmpty()}">
+
+                        <article class="library-book-card"
+                                th:each="lectura : ${completados}">
+
+                            <a th:href="@{/libro/{id}(id=${lectura.bookId})}">
+                                <img th:src="${lectura.portadaUrl}"
+                                    th:alt="${lectura.titulo}"
+                                    class="library-book-cover">
+                            </a>
+
+                            <div class="library-book-info">
+
+                                <h3 th:text="${lectura.titulo}">
+                                    Book title
+                                </h3>
+
+                                <p th:text="${lectura.autor}">
+                                    Author
+                                </p>
+
+                                <span class="library-book-tag"
+                                    th:text="#{library.completedTag}">
+                                    🏆 Completed
+                                </span>
+
+                                <div class="reading-progress-info">
+
+                                    <div class="reading-progress-label">
+                                        <span th:text="#{library.readingProgress}">
+                                            Reading progress
+                                        </span>
+                                        <strong>100%</strong>
+                                    </div>
+
+                                    <div class="reading-progress-track">
+                                        <div class="reading-progress-fill"
+                                            style="width: 100%">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <a th:href="@{/libro/{id}(id=${lectura.bookId})}"
+                                class="btn-primary"
+                                th:text="#{library.viewBook}">
+                                    View Book
+                                </a>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                    <div class="library-empty"
+                        th:if="${completados.isEmpty()}">
+
+                        <div class="empty-library-icon">🏆</div>
+
+                        <h2 th:text="#{library.noCompleted}">
+                            No completed books yet
+                        </h2>
+
+                        <p th:text="#{library.noCompletedDescription}">
+                            Your finished books will be collected here.
+                        </p>
+
+                        <a th:href="@{/explorar}"
+                        class="btn-primary"
+                        th:text="#{library.findNextBook}">
+                            Find Your Next Book
                         </a>
 
                     </div>

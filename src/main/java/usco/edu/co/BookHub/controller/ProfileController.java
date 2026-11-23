@@ -2,16 +2,17 @@ package usco.edu.co.BookHub.controller;
 
 import java.security.Principal;
 
-import jakarta.validation.Valid;
-
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.validation.Valid;
 import usco.edu.co.BookHub.dto.request.UpdateProfileRequest;
 import usco.edu.co.BookHub.service.UserService;
 
@@ -19,9 +20,11 @@ import usco.edu.co.BookHub.service.UserService;
 public class ProfileController {
 
     private final UserService userService;
+    private final MessageSource messageSource;
 
-    public ProfileController(UserService userService) {
+    public ProfileController(UserService userService, MessageSource messageSource) {
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/perfil/editar")
@@ -75,7 +78,11 @@ public class ProfileController {
 
         redirectAttributes.addFlashAttribute(
             "successMessage",
-            "Profile updated successfully!"
+            messageSource.getMessage(
+                "profile.edit.success",
+                null,
+                LocaleContextHolder.getLocale()
+            )
         );
 
         return "redirect:/perfil/editar";

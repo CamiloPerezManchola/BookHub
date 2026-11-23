@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
     // --------------------------------
@@ -14,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const ratingOutput = document.getElementById("ratingOutput");
 
     const genreSearch = document.querySelector(".genre-search");
+
     const genreCheckboxes = document.querySelectorAll(
         'input[name="genre"]'
     );
@@ -34,9 +34,42 @@ document.addEventListener("DOMContentLoaded", function () {
         "searchResults"
     );
 
+    const translations = document.getElementById(
+        "exploreTranslations"
+    );
+
     const books = Array.from(
         document.querySelectorAll(".book-card")
     );
+
+    // --------------------------------
+    // TRANSLATIONS
+    // --------------------------------
+
+    const messages = {
+        anyRating: translations.dataset.ratingAny,
+        resultsAll: translations.dataset.resultsAll,
+        resultsFound: translations.dataset.resultsFound,
+        selectAll: clearGenresButton.dataset.selectAll,
+        clearAll: clearGenresButton.dataset.clearAll
+    };
+
+    // Replace placeholders in translated messages
+    function formatMessage(message, values) {
+
+        let result = message;
+
+        Object.keys(values).forEach(function (key) {
+
+            result = result.replace(
+                `{${key}}`,
+                values[key]
+            );
+
+        });
+
+        return result;
+    }
 
     // --------------------------------
     // NORMALIZE TEXT
@@ -50,6 +83,22 @@ document.addEventListener("DOMContentLoaded", function () {
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .trim();
+
+    }
+
+    // --------------------------------
+    // GENRE BUTTON LABEL
+    // --------------------------------
+
+    function updateGenreButton() {
+
+        const allSelected = genreCheckboxes.length > 0 &&
+            Array.from(genreCheckboxes).every(
+                checkbox => checkbox.checked
+            );
+
+        clearGenresButton.textContent =
+            allSelected ? messages.clearAll : messages.selectAll;
 
     }
 
@@ -135,8 +184,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             searchResults.textContent =
                 visibleCount === books.length
-                    ? `Showing all ${visibleCount} books`
-                    : `${visibleCount} of ${books.length} books found`;
+
+                    ? formatMessage(messages.resultsAll, {
+                        count: visibleCount
+                    })
+
+                    : formatMessage(messages.resultsFound, {
+                        visible: visibleCount,
+                        total: books.length
+                    });
 
         }
 
@@ -166,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         ratingOutput.textContent =
             value === 0
-                ? "Any rating"
+                ? messages.anyRating
                 : value.toFixed(1) + " ★";
 
         filterBooks();
@@ -179,7 +235,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     genreCheckboxes.forEach(function (checkbox) {
 
-        checkbox.addEventListener("change", filterBooks);
+        checkbox.addEventListener("change", function () {
+
+            updateGenreButton();
+            filterBooks();
+
+        });
 
     });
 
@@ -220,6 +281,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             });
 
+            updateGenreButton();
             filterBooks();
 
         });
@@ -234,18 +296,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         setTimeout(function () {
 
-            ratingOutput.textContent = "Any rating";
+            ratingOutput.textContent = messages.anyRating;
 
             if (genreSearch) {
+
                 genreSearch.value = "";
 
                 document.querySelectorAll(
                     ".genre-grid .checkbox-label"
                 ).forEach(label => {
+
                     label.hidden = false;
+
                 });
+
             }
 
+            updateGenreButton();
             filterBooks();
 
         }, 0);
@@ -253,8 +320,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // --------------------------------
-    // INITIAL FILTER
+    // INITIALIZATION
     // --------------------------------
+
+    updateGenreButton();
 
     filterBooks();
 

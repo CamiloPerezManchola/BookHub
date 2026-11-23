@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import usco.edu.co.BookHub.model.Role;
 import usco.edu.co.BookHub.model.User;
 
 @Repository
@@ -22,4 +23,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsernameIgnoreCase(String username);
 
     boolean existsByEmailIgnoreCase(String email);
+
+    boolean existsByUsernameIgnoreCaseAndIdNot(
+        String username, Long id);
+
+    boolean existsByEmailIgnoreCaseAndIdNot(
+        String email, Long id);
+
+    long countByRol(Role rol);
 }

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
+
+<head th:replace="~{fragments/head :: head(
+    'BookHub | My Statistics',
+    'Discover your reading habits and statistics.'
+)}">
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="statistics-container">
+
+        <section class="statistics-heading">
+
+            <div>
+                <span class="statistics-subtitle"
+                      th:text="#{statistics.subtitle}">
+                    BOOKHUB / MI ACTIVIDAD
+                </span>
+
+                <h1 th:text="#{statistics.title}">
+                    Mis estadísticas
+                </h1>
+
+                <p th:text="#{statistics.description}">
+                    Descubre tus hábitos de lectura y
+                    conoce mejor tus preferencias.
+                </p>
+            </div>
+
+            <div class="statistics-icon">
+                📊
+            </div>
+
+        </section>
+
+
+        <!-- Statistics cards -->
+
+        <section class="statistics-grid">
+
+            <article class="stat-card">
+
+                <div class="stat-icon blue">
+                    📚
+                </div>
+
+                <div>
+                    <p th:text="#{statistics.completedBooks}">
+                        Libros completados
+                    </p>
+
+                    <h2 th:text="${estadisticas.totalCompletados}">
+                        0
+                    </h2>
+                </div>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon yellow">
+                    ⭐
+                </div>
+
+                <div>
+                    <p th:text="#{statistics.averageRating}">
+                        Calificación promedio
+                    </p>
+
+                    <h2>
+                        <span th:text="${estadisticas.promedioCalificaciones}">
+                            0.0
+                        </span>
+                        <small>/ 5</small>
+                    </h2>
+                </div>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon purple">
+                    ✍️
+                </div>
+
+                <div>
+                    <p th:text="#{statistics.mostReadAuthor}">
+                        Autor más leído
+                    </p>
+
+                    <h2 class="author-stat"
+                        th:text="${estadisticas.autorMasLeido}">
+                        Sin datos
+                    </h2>
+
+                    <small th:text="|${estadisticas.cantidadLibrosAutor} #{statistics.booksCompleted}|">
+                        0 libros completados
+                    </small>
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- Genres chart -->
+
+        <section class="statistics-panel">
+
+            <div class="panel-heading">
+
+                <div>
+                    <h3 th:text="#{statistics.favoriteGenres}">
+                        Mis géneros favoritos
+                    </h3>
+
+                    <p th:text="#{statistics.genreDescription}">
+                        Cantidad de libros completados por género.
+                    </p>
+                </div>
+
+                <span class="panel-icon">📖</span>
+
+            </div>
+
+            <div class="chart-container"
+                 th:if="${!estadisticas.generos.isEmpty()}">
+
+                <canvas id="genresChart"></canvas>
+
+            </div>
+
+            <div class="empty-statistics"
+                 th:if="${estadisticas.generos.isEmpty()}">
+
+                <span>📚</span>
+
+                <h4 th:text="#{statistics.emptyTitle}">
+                    Aún no tienes estadísticas
+                </h4>
+
+                <p th:text="#{statistics.emptyDescription}">
+                    Completa algunos libros para descubrir
+                    cuáles son tus géneros favoritos.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Reading summary -->
+
+        <section class="statistics-panel summary-panel">
+
+            <h3 th:text="#{statistics.readingSummary}">
+                Resumen de lectura
+            </h3>
+
+            <p th:text="#{statistics.summaryDescription}">
+                Estos son algunos datos sobre tu experiencia
+                dentro de BookHub.
+            </p>
+
+            <div class="summary-content">
+
+                <div>
+                    <span th:text="#{statistics.completedBooks}">
+                        Libros completados
+                    </span>
+
+                    <strong th:text="${estadisticas.totalCompletados}">
+                        0
+                    </strong>
+                </div>
+
+                <div>
+                    <span th:text="#{statistics.preferredAuthor}">
+                        Autor preferido
+                    </span>
+
+                    <strong th:text="${estadisticas.autorMasLeido}">
+                        Sin datos
+                    </strong>
+                </div>
+
+                <div>
+                    <span th:text="#{statistics.exploredGenres}">
+                        Géneros explorados
+                    </span>
+
+                    <strong th:text="${estadisticas.generos.size()}">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Chart.js translations -->
+
+    <div id="statisticsTranslations"
+         hidden
+         th:data-completed-books="#{statistics.completedBooks}"
+         th:data-books-completed="#{statistics.booksCompleted}">
+    </div>
+
+    <script th:inline="javascript">
+        window.bookHubGenreLabels =
+            /*[[${estadisticas.generos}]]*/ [];
+
+        window.bookHubGenreValues =
+            /*[[${estadisticas.cantidadesPorGenero}]]*/ [];
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script th:src="@{/js/estadisticas.js}"></script>
+
+</body>
+</html>

@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
 <head th:replace="~{fragments/head :: head(
     'BookHub | Home',
     'Discover, track and share your favorite books.'
@@ -9,17 +11,19 @@
 
   <!-- Logout notification -->
   <div th:if="${param.logout}"
-      class="logout-toast"
-      id="logoutToast"
-      role="status"
-      aria-live="polite">
+       class="logout-toast"
+       id="logoutToast"
+       role="status"
+       aria-live="polite">
 
       <div class="toast-icon">✓</div>
 
       <div class="toast-content">
-          <strong>See you soon!</strong>
+          <strong th:text="#{home.logout.title}">
+              See you soon!
+          </strong>
 
-          <p>
+          <p th:text="#{home.logout.description}">
               You've logged out successfully.
               Your next reading adventure awaits!
           </p>
@@ -28,90 +32,252 @@
       <button type="button"
               class="toast-close"
               onclick="this.parentElement.remove()"
-              aria-label="Close notification">
+              th:aria-label="#{home.logout.close}">
           ×
       </button>
 
   </div>
 
-  <!-- Include the header fragment dynamically -->
+  <!-- Header -->
   <div th:replace="~{fragments/header :: header}"></div>
 
   <main class="container">
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-image">
-          <img th:src="@{/images/pages/Homepage.jpg}"
-              alt="BookHub Homepage"
-              class="hero-banner">
-      </div>
-      
-      <div class="hero-content">
-        <h1>Book smart.</h1>
-        <p>Track every book, share them with the world (or don't) and find new life-changing reads.</p>
-        <a th:href="@{/register}" class="btn-primary">
-            Join Bookhub
+
+    <!-- HERO FOR VISITORS -->
+    <section class="hero"
+             th:if="${currentUser == null}">
+
+        <div class="hero-image">
+            <img th:src="@{/images/pages/Homepage.jpg}"
+                 th:alt="#{home.image.alt}"
+                 class="hero-banner">
+        </div>
+
+        <div class="hero-content">
+
+            <h1 th:text="#{home.hero.title}">
+                Book smart.
+            </h1>
+
+            <p th:text="#{home.hero.description}">
+                Track every book, share them with the world
+                (or don't) and find new life-changing reads.
+            </p>
+
+            <a th:href="@{/register}"
+               class="btn-primary"
+               th:text="#{home.hero.join}">
+                Join BookHub
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- HERO FOR AUTHENTICATED USERS -->
+    <section class="hero logged-user-hero"
+             th:if="${currentUser != null}">
+
+        <div class="hero-content">
+
+            <h1>
+                <span th:text="#{home.welcome}">Welcome back,</span>
+                <span th:text="${currentUser.nombre}">Reader</span><span th:text="#{home.welcome.end}">!</span>
+            </h1>
+
+            <p th:text="#{home.welcome.description}">
+                Your next reading adventure starts here.
+                Explore new books, continue reading
+                and share your thoughts with the community.
+            </p>
+
+            <div class="hero-actions">
+
+                <a th:href="@{/mibiblioteca}"
+                   class="btn-primary">
+                    📚 <span th:text="#{home.myLibrary}">My Library</span>
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="hero-image">
+            <img th:src="@{/images/pages/Homepage.jpg}"
+                 th:alt="#{home.image.alt}"
+                 class="hero-banner">
+        </div>
+
+    </section>
+
+
+    <!-- FEATURES FOR VISITORS -->
+    <section class="features-grid"
+             th:if="${currentUser == null}">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 th:text="#{home.features.find}">Find</h3>
+                <span class="card-icon">🔍</span>
+            </div>
+            <p th:text="#{home.features.find.description}">
+                Search and browse for new books
+                and discover your next favorite.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 th:text="#{home.features.track}">Track</h3>
+                <span class="card-icon">🔖</span>
+            </div>
+            <p th:text="#{home.features.track.description}">
+                Keep track of everything you read
+                and organize your personal library.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 th:text="#{home.features.connect}">Connect</h3>
+                <span class="card-icon">😃</span>
+            </div>
+            <p th:text="#{home.features.connect.description}">
+                Share your reading experiences
+                and discover other readers.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 th:text="#{home.features.discover}">Discover</h3>
+                <span class="card-icon">🚀</span>
+            </div>
+            <p th:text="#{home.features.discover.description}">
+                Find new books and authors
+                based on your preferences.
+            </p>
+        </div>
+
+    </section>
+
+
+    <!-- DASHBOARD SHORTCUTS FOR LOGGED USERS -->
+    <section class="features-grid"
+             th:if="${currentUser != null}">
+
+        <a th:href="@{/estadisticas}"
+           class="card dashboard-card">
+
+            <div class="card-header">
+                <h3 th:text="#{home.statistics}">My Statistics</h3>
+                <span class="card-icon">📊</span>
+            </div>
+
+            <p th:text="#{home.statistics.description}">
+                Discover your reading habits, favorite genres,
+                completed books and most-read authors.
+            </p>
+
+            <span class="dashboard-link"
+                  th:text="#{home.statistics.link}">
+                View statistics →
+            </span>
+
         </a>
-      </div>
+
+
+        <a th:href="@{/explorar}"
+           class="card dashboard-card">
+
+            <div class="card-header">
+                <h3 th:text="#{home.explore}">Explore Books</h3>
+                <span class="card-icon">🔍</span>
+            </div>
+
+            <p th:text="#{home.explore.description}">
+                Discover books from other authors
+                and find something new to read.
+            </p>
+
+            <span class="dashboard-link"
+                  th:text="#{home.explore.link}">
+                Discover books →
+            </span>
+
+        </a>
+
+
+        <a th:href="@{/crear-libro}"
+           class="card dashboard-card">
+
+            <div class="card-header">
+                <h3 th:text="#{home.publish}">Publish a Book</h3>
+                <span class="card-icon">✍️</span>
+            </div>
+
+            <p th:text="#{home.publish.description}">
+                Share your own stories and
+                publish books with the community.
+            </p>
+
+            <span class="dashboard-link"
+                  th:text="#{home.publish.link}">
+                Create a book →
+            </span>
+
+        </a>
+
+
+        <a th:href="@{/perfil/editar}"
+           class="card dashboard-card">
+
+            <div class="card-header">
+                <h3 th:text="#{home.profile}">My Profile</h3>
+                <span class="card-icon">👤</span>
+            </div>
+
+            <p th:text="#{home.profile.description}">
+                Customize your profile and
+                update your personal information.
+            </p>
+
+            <span class="dashboard-link"
+                  th:text="#{home.profile.link}">
+                Edit profile →
+            </span>
+
+        </a>
+
     </section>
 
-    <!-- Feature Cards Section -->
-    <section class="features-grid">
-      <div class="card">
-        <div class="card-header">
-          <h3>Find</h3>
-          <span class="card-icon">🔍</span>
-        </div>
-        <p>Search and browse for new books — or find inspiration in other reader's libraries.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Track</h3>
-          <span class="card-icon">🔖</span>
-        </div>
-        <p>Track every book by want to read, currently reading, read and did not finish.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Connect</h3>
-          <span class="card-icon">😃</span>
-        </div>
-        <p>Explore others reader's bookshelves and follow for their next reads.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3>Discover</h3>
-          <span class="card-icon">🚀</span>
-        </div>
-        <p>Uncover new books and authors based on your reading history and preferences.</p>
-      </div>
-    </section>
   </main>
 
-  <!-- Bottom Navigation Bar (Visible on mobile screens) -->
+
+  <!-- Bottom Navigation Bar -->
   <nav class="bottom-nav">
-      <a href="#home" class="nav-item active">
+
+      <a th:href="@{/}" class="nav-item active">
           <span class="nav-icon">🏠</span>
-          <span>Home</span>
+          <span th:text="#{home.nav.home}">Home</span>
       </a>
 
       <a th:href="@{/mibiblioteca}" class="nav-item">
           <span class="nav-icon">📚</span>
-          <span>My Library</span>
-      </a>
-
-      <a href="#explore" class="nav-item">
-          <span class="nav-icon">🚀</span>
-          <span>Explore</span>
+          <span th:text="#{home.nav.library}">My Library</span>
       </a>
 
       <a th:href="@{/explorar}" class="nav-item">
-          <span class="nav-icon">🔍</span>
-          <span>Search</span>
+          <span class="nav-icon">🚀</span>
+          <span th:text="#{home.nav.explore}">Explore</span>
       </a>
+
+      <a th:href="@{/crear-libro}" class="nav-item">
+          <span class="nav-icon">✍️</span>
+          <span th:text="#{home.nav.publish}">Publish</span>
+      </a>
+
   </nav>
 
   <div th:replace="~{fragments/footer :: footer}"></div>
@@ -121,5 +287,6 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

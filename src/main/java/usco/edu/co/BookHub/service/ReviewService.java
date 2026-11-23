@@ -12,6 +12,7 @@ import usco.edu.co.BookHub.exception.ResourceNotFoundException;
 import usco.edu.co.BookHub.model.Book;
 import usco.edu.co.BookHub.model.Review;
 import usco.edu.co.BookHub.model.User;
+import usco.edu.co.BookHub.model.Role;
 import usco.edu.co.BookHub.repository.BookRepository;
 import usco.edu.co.BookHub.repository.ReviewRepository;
 
@@ -38,6 +39,9 @@ public class ReviewService {
         response.setRating(review.getRating());
         response.setComentario(review.getComentario());
         response.setFechaCreacion(review.getFechaCreacion());
+
+        response.setBookId(review.getBook().getId());
+        response.setBookTitle(review.getBook().getTitulo());
 
         response.setUserId(review.getUser().getId());
         response.setUsername(review.getUser().getUsername());
@@ -108,7 +112,7 @@ public class ReviewService {
                 new ResourceNotFoundException("Review", reviewId)
             );
 
-        verificarPropietario(review, user);
+        verificarPermiso(review, user);
 
         review.setRating(request.getRating());
         review.setComentario(request.getComentario());
@@ -126,19 +130,52 @@ public class ReviewService {
                 new ResourceNotFoundException("Review", reviewId)
             );
 
-        verificarPropietario(review, user);
+        verificarPermiso(review, user);
 
         reviewRepository.delete(review);
     }
 
-    private void verificarPropietario(
-            Review review, User user) {
+    private void verificarPermiso(
+            Review review,
+            User user) {
 
-        if (!review.getUser().getId().equals(user.getId())) {
+        boolean esAdmin = user.getRol() == Role.ADMIN;
+
+        boolean esPropietario =
+            review.getUser().getId().equals(user.getId());
+
+        if (!esAdmin && !esPropietario) {
             throw new AccessDeniedException(
-                "You cannot modify another user's review."
+                "You cannot modify this review."
             );
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponse> obtenerTodas() {
+
+        return reviewRepository.findAll()
+            .stream()
+            .map(this::convertirAResponse)
+            .toList();
+    }
+
+    public void eliminarComoAdmin(
+            Long reviewId,
+            User currentUser) {
+
+        if (currentUser.getRol() != Role.ADMIN) {
+            throw new AccessDeniedException(
+                "Administrator permissions required."
+            );
+        }
+
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Review", reviewId)
+            );
+
+        reviewRepository.delete(review);
     }
 
     public Double getAverageRating(Long bookId) {

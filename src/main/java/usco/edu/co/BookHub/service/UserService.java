@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import usco.edu.co.BookHub.dto.request.RegisterRequest;
 import usco.edu.co.BookHub.dto.request.UpdateProfileRequest;
+import usco.edu.co.BookHub.dto.request.AdminUpdateUserRequest;
 import usco.edu.co.BookHub.dto.response.UserResponse;
 import usco.edu.co.BookHub.exception.DuplicateResourceException;
 import usco.edu.co.BookHub.exception.ResourceNotFoundException;
@@ -38,6 +39,7 @@ public class UserService {
 
         response.setId(user.getId());
         response.setNombre(user.getNombre());
+        response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setDescripcion(user.getDescripcion());
         response.setFotoPerfilUrl(user.getFotoPerfilUrl());
@@ -138,15 +140,133 @@ public class UserService {
                 .toList();
     }
 
+    // Update user (ADMIN only)
+    public UserResponse actualizarUsuario(
+            Long id,
+            AdminUpdateUserRequest request,
+            User currentUser) {
+
+        // Verify administrator permissions
+        verificarAdmin(currentUser);
+
+        // Find user
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                    new ResourceNotFoundException("User", id)
+                );
+
+        // Normalize username and email
+        String username = request.getUsername()
+                .trim()
+                .toLowerCase(java.util.Locale.ROOT);
+
+        String email = request.getEmail()
+                .trim()
+                .toLowerCase(java.util.Locale.ROOT);
+
+        // Check duplicate username excluding current user
+        if (userRepository.existsByUsernameIgnoreCaseAndIdNot(
+                username, id)) {
+
+            throw new DuplicateResourceException(
+                "The username is already registered."
+            );
+        }
+
+        // Check duplicate email excluding current user
+        if (userRepository.existsByEmailIgnoreCaseAndIdNot(
+                email, id)) {
+
+            throw new DuplicateResourceException(
+                "The email is already registered."
+            );
+        }
+
+        // Validate role
+        Role newRole = user.getRol();
+
+        if (request.getRol() != null
+                && !request.getRol().trim().isEmpty()) {
+
+            try {
+                newRole = Role.valueOf(
+                    request.getRol().trim().toUpperCase(
+                        java.util.Locale.ROOT
+                    )
+                );
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                    "Invalid user role."
+                );
+            }
+        }
+
+        // Protect current administrator from demotion
+        if (currentUser.getId().equals(id)
+                && newRole != Role.ADMIN) {
+
+            throw new IllegalArgumentException(
+                "You cannot remove your own administrator role."
+            );
+        }
+
+        // Protect the last administrator
+        if (user.getRol() == Role.ADMIN
+                && newRole != Role.ADMIN
+                && userRepository.countByRol(Role.ADMIN) <= 1) {
+
+            throw new IllegalArgumentException(
+                "Cannot demote the last administrator."
+            );
+        }
+
+        // Update user information
+        user.setNombre(request.getNombre().trim());
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setDescripcion(request.getDescripcion());
+        user.setFotoPerfilUrl(request.getFotoPerfilUrl());
+
+        user.setRol(newRole);
+
+        // Update password only when provided
+        if (request.getPassword() != null
+                && !request.getPassword().trim().isEmpty()) {
+
+            user.setPassword(
+                passwordEncoder.encode(request.getPassword())
+            );
+        }
+
+        // Save and return response
+        User updated = userRepository.save(user);
+
+        return convertirAResponse(updated);
+    }
+
     // Delete user (ADMIN only)
     public void eliminar(Long id, User currentUser) {
 
         verificarAdmin(currentUser);
 
+        if (currentUser.getId().equals(id)) {
+            throw new IllegalArgumentException(
+                "You cannot delete your own account."
+            );
+        }
+
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                    new ResourceNotFoundException("User", id)
-                );
+            .orElseThrow(() ->
+                new ResourceNotFoundException("User", id)
+            );
+
+        if (user.getRol() == Role.ADMIN
+                && userRepository.countByRol(Role.ADMIN) <= 1) {
+
+            throw new IllegalArgumentException(
+                "Cannot delete the last administrator."
+            );
+        }
 
         userRepository.delete(user);
     }

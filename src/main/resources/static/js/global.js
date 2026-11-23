@@ -18,6 +18,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    const languageSelect = document.getElementById("languageSelect");
+
+    if (!languageSelect) return;
+
+    languageSelect.addEventListener("change", function () {
+
+        const selectedLanguage = this.value;
+
+        const currentUrl = new URL(window.location.href);
+
+        currentUrl.searchParams.set("lang", selectedLanguage);
+
+        window.location.assign(currentUrl.toString());
+
+    });
+
+});
 
 document.addEventListener("DOMContentLoaded", () => {
 

@@ -4,41 +4,52 @@
 
 <footer th:fragment="footer" class="site-footer">
   <div class="footer-container">
+
     <div class="footer-brand">
       <div class="footer-logo">
         <div class="logo-placeholder">📖</div>
         <span class="brand-name">Bookhub</span>
       </div>
-      <p class="footer-tagline">"Connecting readers with their next transformative story."</p>
+      <p class="footer-tagline" th:text="#{footer.tagline}">
+        Connecting readers with their next transformative story.
+      </p>
     </div>
 
     <div class="footer-mission">
-      <h4>Our Mission</h4>
-      <p>Empowering book lovers everywhere to discover, track, and share their personal libraries seamlessly within a global community.</p>
+      <h4 th:text="#{footer.mission.title}">Our Mission</h4>
+      <p th:text="#{footer.mission.description}">
+        Empowering book lovers everywhere to discover, track, and share
+        their personal libraries seamlessly within a global community.
+      </p>
     </div>
 
     <div class="footer-links">
-      <h4>Navigation</h4>
+      <h4 th:text="#{footer.navigation.title}">Navigation</h4>
       <ul>
-        <li><a th:href="@{/}">Home</a></li>
-        <li><a th:href="@{/explorar}">Explore</a></li>
-        <li><a th:href="@{/library}">Library</a></li>
+        <li>
+          <a th:href="@{/}" th:text="#{footer.navigation.home}">Home</a>
+        </li>
+        <li>
+          <a th:href="@{/explorar}" th:text="#{footer.navigation.explore}">Explore</a>
+        </li>
+        <li>
+          <a th:href="@{/library}" th:text="#{footer.navigation.library}">Library</a>
+        </li>
       </ul>
     </div>
+
   </div>
 
   <div class="footer-bottom">
-      <p>
-          &copy;
-          <span th:text="${#temporals.year(#temporals.createNow())}">
-              2026
-          </span>
-          Bookhub. All rights reserved.
-      </p>
+    <p>
+      &copy;
+      <span th:text="${#temporals.year(#temporals.createNow())}">2026</span>
+      <span th:text="#{footer.copyright}">Bookhub. All rights reserved.</span>
+    </p>
 
-      <p class="credits">
-          Crafted with ❤️ for book enthusiasts.
-      </p>
+    <p class="credits" th:text="#{footer.credits}">
+      Crafted with ❤️ for book enthusiasts.
+    </p>
   </div>
 </footer>
 

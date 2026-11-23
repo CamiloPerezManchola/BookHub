@@ -30,4 +30,6 @@ public interface FavoriteRepository
     List<Book> findBooksByUserId(
         @Param("userId") Long userId
     );
+
+    void deleteByBook_Id(Long bookId);
 }

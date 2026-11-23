@@ -10,7 +10,7 @@
     </parent>
     <groupId>usco.edu.co</groupId>
     <artifactId>BookHub</artifactId>
-    <version>0.0.2</version>
+    <version>1</version>
     <packaging>war</packaging>
     <name>BookHub</name>
     <description>BookHub Project</description>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
+
+<head th:replace="~{fragments/head :: head(
+    #{admin.title},
+    #{admin.description}
+)}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="admin-layout container">
+
+    <!-- Heading -->
+    <section class="admin-heading">
+        <h1 th:text="#{admin.heading}">Admin Dashboard</h1>
+        <p th:text="#{admin.subtitle}">Manage the BookHub platform.</p>
+    </section>
+
+    <div id="adminAlert"
+         class="alert d-none"
+         role="alert">
+    </div>
+
+    <!-- Statistics -->
+    <section class="admin-stats">
+
+        <div class="admin-stat-card">
+            <span th:text="#{admin.stats.users}">Users</span>
+            <strong id="totalUsers">0</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span th:text="#{admin.stats.books}">Books</span>
+            <strong id="totalBooks">0</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span th:text="#{admin.stats.reviews}">Reviews</span>
+            <strong id="totalReviews">0</strong>
+        </div>
+
+    </section>
+
+    <!-- Navigation -->
+    <nav class="admin-tabs">
+
+        <button class="admin-tab active"
+                data-section="users"
+                th:text="#{admin.tabs.users}">
+            Users
+        </button>
+
+        <button class="admin-tab"
+                data-section="books"
+                th:text="#{admin.tabs.books}">
+            Books
+        </button>
+
+        <button class="admin-tab"
+                data-section="reviews"
+                th:text="#{admin.tabs.reviews}">
+            Reviews
+        </button>
+
+    </nav>
+
+    <!-- USERS -->
+    <section id="usersSection"
+             class="admin-section">
+
+        <div class="admin-section-header">
+            <div>
+                <h2 th:text="#{admin.users.title}">User Management</h2>
+                <p th:text="#{admin.users.description}">
+                    Manage registered BookHub accounts.
+                </p>
+            </div>
+
+            <div class="admin-actions">
+                <input type="search"
+                       id="userSearch"
+                       th:placeholder="#{admin.users.search}"
+                       placeholder="Search users...">
+
+                <button id="refreshUsersBtn"
+                        class="btn btn-outline-primary"
+                        th:text="#{admin.action.refresh}">
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-table-wrapper">
+
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th th:text="#{admin.table.id}">ID</th>
+                        <th th:text="#{admin.table.name}">Name</th>
+                        <th th:text="#{admin.table.email}">Email</th>
+                        <th th:text="#{admin.table.role}">Role</th>
+                        <th th:text="#{admin.table.registered}">Registered</th>
+                        <th th:text="#{admin.table.actions}">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="usersTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- BOOKS -->
+    <section id="booksSection"
+             class="admin-section"
+             hidden>
+
+        <div class="admin-section-header">
+            <div>
+                <h2 th:text="#{admin.books.title}">Book Management</h2>
+                <p th:text="#{admin.books.description}">
+                    Manage published books.
+                </p>
+            </div>
+
+            <div class="admin-actions">
+                <input type="search"
+                       id="bookSearch"
+                       th:placeholder="#{admin.books.search}"
+                       placeholder="Search books...">
+
+                <button id="addBookBtn"
+                        class="btn btn-primary">
+                    + <span th:text="#{admin.books.add}">Add Book</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-table-wrapper">
+
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th th:text="#{admin.table.id}">ID</th>
+                        <th th:text="#{admin.table.cover}">Cover</th>
+                        <th th:text="#{admin.table.title}">Title</th>
+                        <th th:text="#{admin.table.author}">Author</th>
+                        <th th:text="#{admin.table.year}">Year</th>
+                        <th th:text="#{admin.table.publisher}">Publisher</th>
+                        <th th:text="#{admin.table.actions}">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="booksTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- REVIEWS -->
+    <section id="reviewsSection"
+             class="admin-section"
+             hidden>
+
+        <div class="admin-section-header">
+            <h2 th:text="#{admin.reviews.title}">Review Moderation</h2>
+        </div>
+
+        <div class="admin-table-wrapper">
+
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th th:text="#{admin.table.id}">ID</th>
+                        <th th:text="#{admin.table.user}">User</th>
+                        <th th:text="#{admin.table.rating}">Rating</th>
+                        <th th:text="#{admin.table.comment}">Comment</th>
+                        <th th:text="#{admin.table.date}">Date</th>
+                        <th th:text="#{admin.table.actions}">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="reviewsTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- USER EDIT MODAL -->
+<dialog id="userModal" class="admin-modal">
+    <form id="userForm" class="admin-modal-content">
+
+        <div class="modal-heading">
+            <div>
+                <h2 id="userModalTitle"
+                    th:text="#{admin.users.edit}">
+                    Edit User
+                </h2>
+
+                <p th:text="#{admin.users.editDescription}">
+                    Update account information and permissions.
+                </p>
+            </div>
+
+            <button type="button"
+                    class="modal-close"
+                    data-close="userModal"
+                    aria-label="Close">×</button>
+        </div>
+
+        <input type="hidden" id="userId">
+
+        <label for="userName"
+               th:text="#{admin.form.fullName}">
+            Full name
+        </label>
+
+        <input id="userName"
+               class="form-control"
+               maxlength="100"
+               required>
+
+        <label for="userUsername"
+               th:text="#{admin.form.username}">
+            Username
+        </label>
+
+        <input id="userUsername"
+               class="form-control"
+               minlength="3"
+               maxlength="50"
+               required>
+
+        <label for="userEmail"
+               th:text="#{admin.form.email}">
+            Email
+        </label>
+
+        <input id="userEmail"
+               type="email"
+               class="form-control"
+               maxlength="150"
+               required>
+
+        <label for="userDescription"
+               th:text="#{admin.form.description}">
+            Description
+        </label>
+
+        <textarea id="userDescription"
+                  class="form-control"
+                  maxlength="500"></textarea>
+
+        <label for="userPhoto"
+               th:text="#{admin.form.profilePhoto}">
+            Profile photo URL
+        </label>
+
+        <input id="userPhoto"
+               type="url"
+               class="form-control">
+
+        <label for="userRole"
+               th:text="#{admin.form.role}">
+            Role
+        </label>
+
+        <select id="userRole"
+                class="form-select"
+                required>
+            <option value="USER"
+                    th:text="#{admin.roles.user}">
+                USER
+            </option>
+
+            <option value="ADMIN"
+                    th:text="#{admin.roles.admin}">
+                ADMIN
+            </option>
+        </select>
+
+        <label for="userPassword"
+               th:text="#{admin.form.newPassword}">
+            New password
+        </label>
+
+        <input id="userPassword"
+               type="password"
+               class="form-control"
+               th:placeholder="#{admin.form.passwordHint}"
+               placeholder="Leave empty to keep current password">
+
+        <div class="modal-actions">
+
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-close="userModal"
+                    th:text="#{admin.action.cancel}">
+                Cancel
+            </button>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    th:text="#{admin.action.saveChanges}">
+                Save changes
+            </button>
+
+        </div>
+
+    </form>
+</dialog>
+
+
+<!-- BOOK CREATE / EDIT MODAL -->
+<dialog id="bookModal" class="admin-modal">
+    <form id="bookForm" class="admin-modal-content">
+
+        <div class="modal-heading">
+            <div>
+                <h2 id="bookModalTitle"
+                    th:text="#{admin.books.add}">
+                    Add Book
+                </h2>
+
+                <p th:text="#{admin.books.formDescription}">
+                    Manage book information.
+                </p>
+            </div>
+
+            <button type="button"
+                    class="modal-close"
+                    data-close="bookModal"
+                    aria-label="Close">×</button>
+        </div>
+
+        <input type="hidden" id="bookId">
+
+        <label for="bookTitle"
+               th:text="#{admin.form.title}">
+            Title
+        </label>
+
+        <input id="bookTitle"
+               class="form-control"
+               maxlength="200"
+               required>
+
+        <label for="bookAuthor"
+               th:text="#{admin.form.author}">
+            Author
+        </label>
+
+        <input id="bookAuthor"
+               class="form-control"
+               required>
+
+        <label for="bookCover"
+               th:text="#{admin.form.coverUrl}">
+            Cover URL
+        </label>
+
+        <input id="bookCover"
+               type="url"
+               class="form-control">
+
+        <label for="bookYear"
+               th:text="#{admin.form.publicationYear}">
+            Publication year
+        </label>
+
+        <input id="bookYear"
+               type="number"
+               min="0"
+               max="2026"
+               class="form-control"
+               required>
+
+        <label for="bookGenre"
+               th:text="#{admin.form.genre}">
+            Genre
+        </label>
+
+        <input id="bookGenre"
+               class="form-control"
+               required>
+
+        <label for="bookSynopsis"
+               th:text="#{admin.form.synopsis}">
+            Synopsis
+        </label>
+
+        <textarea id="bookSynopsis"
+                  class="form-control"
+                  rows="4"
+                  required></textarea>
+
+        <div id="chapterFields">
+
+            <h3 th:text="#{admin.chapters.first}">
+                First chapter
+            </h3>
+
+            <label for="chapterTitle"
+                   th:text="#{admin.chapters.title}">
+                Chapter title
+            </label>
+
+            <input id="chapterTitle"
+                   class="form-control">
+
+            <label for="chapterContent"
+                   th:text="#{admin.chapters.content}">
+                Chapter content
+            </label>
+
+            <textarea id="chapterContent"
+                      class="form-control"
+                      rows="5"></textarea>
+
+            <small class="text-muted"
+                   th:text="#{admin.chapters.hint}">
+                A new book must contain at least one chapter.
+                When editing, existing chapters will be preserved.
+            </small>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-close="bookModal"
+                    th:text="#{admin.action.cancel}">
+                Cancel
+            </button>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    th:text="#{admin.books.save}">
+                Save book
+            </button>
+
+        </div>
+
+    </form>
+</dialog>
+
+
+<!-- DELETE CONFIRMATION MODAL -->
+<dialog id="confirmModal" class="admin-modal">
+    <div class="admin-modal-content">
+
+        <h2 th:text="#{admin.confirm.title}">
+            Confirm deletion
+        </h2>
+
+        <p id="confirmMessage"
+           th:text="#{admin.confirm.description}">
+            Are you sure you want to delete this item?
+        </p>
+
+        <div class="modal-actions">
+
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-close="confirmModal"
+                    th:text="#{admin.action.cancel}">
+                Cancel
+            </button>
+
+            <button type="button"
+                    id="confirmDeleteBtn"
+                    class="btn btn-danger"
+                    th:text="#{admin.action.delete}">
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+</dialog>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+<!-- JavaScript translations -->
+<div id="adminTranslations"
+     hidden
+     th:data-users-not-found="#{admin.users.notFound}"
+     th:data-books-not-found="#{admin.books.notFound}"
+     th:data-reviews-not-found="#{admin.reviews.notFound}"
+     th:data-book-cover="#{admin.books.coverAlt}"
+     th:data-no-cover="#{admin.books.noCover}"
+     th:data-no-comment="#{admin.reviews.noComment}"
+     th:data-edit="#{admin.action.edit}"
+     th:data-delete="#{admin.action.delete}"
+     th:data-user-not-found="#{admin.users.userNotFound}"
+     th:data-user-updated="#{admin.users.updated}"
+     th:data-user-deleted="#{admin.users.deleted}"
+     th:data-delete-user-confirm="#{admin.users.deleteConfirm}"
+     th:data-book-not-found="#{admin.books.bookNotFound}"
+     th:data-add-book="#{admin.books.add}"
+     th:data-edit-book="#{admin.books.edit}"
+     th:data-book-chapter-required="#{admin.books.chapterRequired}"
+     th:data-book-updated="#{admin.books.updated}"
+     th:data-book-created="#{admin.books.created}"
+     th:data-book-deleted="#{admin.books.deleted}"
+     th:data-delete-book-confirm="#{admin.books.deleteConfirm}"
+     th:data-review-deleted="#{admin.reviews.deleted}"
+     th:data-delete-review-confirm="#{admin.reviews.deleteConfirm}"
+     th:data-request-failed="#{admin.requestFailed}">
+</div>
+
+<script th:src="@{/js/admin.js}" defer></script>
+
+</body>
+</html>

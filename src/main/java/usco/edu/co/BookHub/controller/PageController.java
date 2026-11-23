@@ -17,6 +17,7 @@ import usco.edu.co.BookHub.repository.BookRepository;
 import usco.edu.co.BookHub.service.BookService;
 import usco.edu.co.BookHub.service.ReviewService;
 import usco.edu.co.BookHub.service.BookInteractionService;
+import usco.edu.co.BookHub.service.LibraryService;
 import usco.edu.co.BookHub.repository.ReviewRepository;
 
 @Controller
@@ -28,6 +29,7 @@ public class PageController {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final ReviewRepository reviewRepository;
+    private final LibraryService libraryService;
 
     public PageController(
             BookService bookService,
@@ -35,7 +37,8 @@ public class PageController {
             BookInteractionService interactionService,
             UserRepository userRepository,
             BookRepository bookRepository,
-            ReviewRepository reviewRepository) {
+            ReviewRepository reviewRepository,
+            LibraryService libraryService) {
 
         this.bookService = bookService;
         this.reviewService = reviewService;
@@ -43,6 +46,7 @@ public class PageController {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.reviewRepository = reviewRepository;
+        this.libraryService = libraryService;
     }
 
     @GetMapping("/")
@@ -220,15 +224,32 @@ public class PageController {
 
         Long userId = currentUser.getId();
 
-        // Books published by this user
-        var publicados = bookRepository.findByPublisher_Id(userId);
+        // Published books
+        var publicados =
+            bookRepository.findByPublisher_Id(userId);
 
         // Favorite books
-        var favoritos = interactionService.getFavoriteBooks(userId);
+        var favoritos =
+            interactionService.getFavoriteBooks(userId);
 
         // Saved books
-        var guardados = interactionService.getSavedBooks(userId);
+        var guardados =
+            interactionService.getSavedBooks(userId);
 
+        // Reading progress
+        var lecturas =
+            libraryService.obtenerLecturas(currentUser);
+
+        // Separate currently reading and completed
+        var actualmenteLeyendo = lecturas.stream()
+            .filter(lectura -> !lectura.isCompleted())
+            .toList();
+
+        var completados = lecturas.stream()
+            .filter(lectura -> lectura.isCompleted())
+            .toList();
+
+        // Existing collections
         model.addAttribute("publicados", publicados);
         model.addAttribute("favoritos", favoritos);
         model.addAttribute("librosGuardados", guardados);
@@ -236,6 +257,27 @@ public class PageController {
         model.addAttribute("totalPublicados", publicados.size());
         model.addAttribute("totalFavoritos", favoritos.size());
         model.addAttribute("totalGuardados", guardados.size());
+
+        // New collections
+        model.addAttribute(
+            "actualmenteLeyendo",
+            actualmenteLeyendo
+        );
+
+        model.addAttribute(
+            "completados",
+            completados
+        );
+
+        model.addAttribute(
+            "totalLeyendo",
+            actualmenteLeyendo.size()
+        );
+
+        model.addAttribute(
+            "totalCompletados",
+            completados.size()
+        );
 
         return "mibiblioteca";
     }

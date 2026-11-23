@@ -1,189 +1,268 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
+
 <head th:replace="~{fragments/head :: head(
-    'Explore Books | BookHub',
-    'Explore books, authors and recommendations.'
+    #{explore.page.title},
+    #{explore.page.description}
 )}">
 </head>
+
 <body>
 
-  <!-- Header Fragment -->
-  <div th:replace="~{fragments/header :: header}"></div>
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
 
-  <div class="explore-layout container">
-    <!-- Sidebar / Top Filter Bar on Mobile -->
-    <aside class="filter-sidebar">
-      <div class="filter-header">
-        <h2>Filters</h2>
-      </div>
+    <div class="explore-layout container">
 
-      <form id="filterForm" class="filter-form">
-        <!-- Publication Year Filter -->
-        <div class="range-inputs">
+        <!-- Sidebar / Top Filter Bar on Mobile -->
+        <aside class="filter-sidebar">
 
-          <input type="number"
-                id="yearFrom"
-                placeholder="From"
-                min="1800"
-                th:attr="max=${maxYear}">
-
-          <span>to</span>
-
-          <input type="number"
-                id="yearTo"
-                placeholder="To"
-                th:attr="min=${minYear},max=${maxYear}">
-
-        </div>
-
-        <p class="filter-hint">
-            Available years:
-            <span th:text="${minYear}">1800</span>
-            -
-            <span th:text="${maxYear}">2026</span>
-        </p>
-
-        <!-- Rating Filter -->
-        <div class="filter-group">
-
-            <label for="minimumRating">
-                Minimum Rating
-            </label>
-
-            <div class="slider-container">
-
-                <input type="range"
-                      id="minimumRating"
-                      min="0"
-                      max="5"
-                      step="0.5"
-                      value="0">
-
-                <output id="ratingOutput">
-                    Any rating
-                </output>
-
+            <!-- Desktop heading -->
+            <div class="filter-header desktop-filter-header">
+                <h2 th:text="#{explore.filters}">
+                    Filters
+                </h2>
             </div>
 
-        </div>
-
-        <!-- Genres Custom Dropdown -->
-        <div class="filter-group">
-          <label>Genres</label>
-          <details class="genre-dropdown">
-            <summary class="dropdown-trigger">Select Genres</summary>
-            <div class="dropdown-content">
-              <input type="text" class="genre-search" placeholder="Search genres...">
-              <button type="button" class="btn-clear-genres">Select All / Clear</button>
-              <div class="genre-grid">
-
-                <label class="checkbox-label"
-                      th:each="genero : ${generos}">
-
-                    <input type="checkbox"
-                          name="genre"
-                          th:value="${genero}">
-
-                    <span th:text="${genero}">
-                        Genre
+            <!-- Mobile toggle -->
+            <details class="mobile-filter-toggle">
+                <summary>
+                    <span>
+                        ⚙️ <span th:text="#{explore.filters}">Filters</span>
                     </span>
+                    <span class="filter-toggle-icon">⌄</span>
+                </summary>
+            </details>
 
-                </label>
+            <!-- Filter Form -->
+            <div class="filter-content">
 
-                <p th:if="${generos.isEmpty()}">
-                    No genres available.
-                </p>
+                <form id="filterForm" class="filter-form">
 
-              </div>
-            </div>
-          </details>
-        </div>
+                    <!-- Publication Year Filter -->
+                    <div class="range-inputs">
 
-        <!-- Reset Button -->
-        <button type="reset" class="btn-reset-filters">Clean All Filters</button>
-      </form>
-    </aside>
+                        <input type="number"
+                               id="yearFrom"
+                               th:placeholder="#{explore.year.from}"
+                               placeholder="From"
+                               min="1800"
+                               th:attr="max=${maxYear}">
 
-    <!-- Main Content Area -->
-    <main class="explore-content">
-      <!-- Top Search Bar -->
-      <div class="explore-search">
-          <span class="search-icon">🔍</span>
+                        <span th:text="#{explore.year.to}">to</span>
 
-          <input type="search"
-                id="bookSearch"
-                name="q"
-                placeholder="Search titles, authors..."
-                th:value="${param.q}"
-                autocomplete="off"
-                aria-label="Search books">
-      </div>
+                        <input type="number"
+                               id="yearTo"
+                               th:placeholder="#{explore.year.to}"
+                               placeholder="To"
+                               th:attr="min=${minYear},max=${maxYear}">
 
-      <p id="searchResults" class="search-results" aria-live="polite"></p>
+                    </div>
 
+                    <p class="filter-hint">
 
-        <!-- Books Grid -->
+                        <span th:text="#{explore.year.available}">
+                            Available years:
+                        </span>
 
-        <div class="books-grid"
-            id="booksGrid">
+                        <span th:text="${minYear}">1800</span>
+                        -
+                        <span th:text="${maxYear}">2026</span>
 
-            <div class="book-card"
-                th:each="libro : ${libros}"
+                    </p>
 
-                th:data-title="${libro.titulo}"
-                th:data-author="${libro.autor}"
-                th:data-year="${libro.anio}"
-                th:data-genre="${libro.genero}"
+                    <!-- Rating Filter -->
+                    <div class="filter-group">
 
-                th:data-rating="${ratingByBook[libro.id] ?: 0}"
+                        <label for="minimumRating"
+                               th:text="#{explore.rating.minimum}">
+                            Minimum Rating
+                        </label>
 
-                tabindex="0">
+                        <div class="slider-container">
 
-                <!-- Book Cover -->
-                <div class="book-cover-wrapper">
+                            <input type="range"
+                                   id="minimumRating"
+                                   min="0"
+                                   max="5"
+                                   step="0.5"
+                                   value="0">
 
-                    <img th:src="${#strings.isEmpty(libro.portadaUrl)
-                                ? '/images/book/Default_fallback.jpg'
-                                : libro.portadaUrl}"
-                        th:alt="${libro.titulo}"
-                        class="book-cover">
-
-                    <!-- Hover Information -->
-                    <div class="book-popover">
-
-                        <h4 class="popover-title"
-                            th:text="${libro.titulo}">
-                            Book title
-                        </h4>
-
-                        <p class="popover-author"
-                          th:text="${libro.autor}">
-                            Author
-                        </p>
-
-                        <div class="popover-rating">
-
-                            <span>⭐</span>
-
-                            <strong th:text="${
-                                ratingByBook[libro.id] != null
-                                ? #numbers.formatDecimal(ratingByBook[libro.id], 1, 1)
-                                : 'No ratings'
-                            }">
-                                No ratings
-                            </strong>
+                            <output id="ratingOutput"
+                                    th:data-any-rating="#{explore.rating.any}">
+                                Any rating
+                            </output>
 
                         </div>
 
-                        <p class="popover-synopsis"
-                          th:text="${libro.sinopsis}">
-                            Book synopsis
-                        </p>
+                    </div>
 
-                        <a th:href="@{/libro/{id}(id=${libro.id})}"
-                          class="btn-primary">
-                            View details
-                        </a>
+                    <!-- Genres -->
+                    <div class="filter-group">
+
+                        <label th:text="#{explore.genres}">
+                            Genres
+                        </label>
+
+                        <details class="genre-dropdown">
+
+                            <summary class="dropdown-trigger"
+                                     th:text="#{explore.genres.select}">
+                                Select Genres
+                            </summary>
+
+                            <div class="dropdown-content">
+
+                                <input type="text"
+                                       class="genre-search"
+                                       th:placeholder="#{explore.genres.search}"
+                                       placeholder="Search genres...">
+
+                                <button type="button"
+                                        class="btn-clear-genres"
+                                        th:data-select-all="#{explore.genres.selectAll}"
+                                        th:data-clear-all="#{explore.genres.clearAll}">
+                                    Select All / Clear
+                                </button>
+
+                                <div class="genre-grid">
+
+                                    <label class="checkbox-label"
+                                           th:each="genero : ${generos}">
+
+                                        <input type="checkbox"
+                                               name="genre"
+                                               th:value="${genero}">
+
+                                        <span th:text="${genero}">
+                                            Genre
+                                        </span>
+
+                                    </label>
+
+                                    <p th:if="${generos.isEmpty()}"
+                                       th:text="#{explore.genres.empty}">
+                                        No genres available.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </details>
+
+                    </div>
+
+                    <!-- Reset Button -->
+                    <button type="reset"
+                            class="btn-reset-filters"
+                            th:text="#{explore.filters.clear}">
+                        Clear All Filters
+                    </button>
+
+                </form>
+
+            </div>
+
+        </aside>
+
+        <!-- Main Content -->
+        <main class="explore-content">
+
+            <!-- Search Bar -->
+            <div class="explore-search">
+
+                <span class="search-icon">🔍</span>
+
+                <input type="search"
+                       id="bookSearch"
+                       name="q"
+                       th:placeholder="#{explore.search.placeholder}"
+                       placeholder="Search titles, authors..."
+                       th:value="${param.q}"
+                       autocomplete="off"
+                       th:attr="aria-label=#{explore.search.label}">
+
+            </div>
+
+            <!-- Dynamic translations for JavaScript -->
+            <div id="exploreTranslations"
+                 hidden
+                 th:data-results-all="#{explore.results.all}"
+                 th:data-results-found="#{explore.results.found}"
+                 th:data-no-books-title="#{explore.empty.title}"
+                 th:data-no-books-description="#{explore.empty.description}"
+                 th:data-rating-any="#{explore.rating.any}">
+            </div>
+
+            <p id="searchResults"
+               class="search-results"
+               aria-live="polite"></p>
+
+            <!-- Books Grid -->
+            <div class="books-grid"
+                 id="booksGrid">
+
+                <div class="book-card"
+                     th:each="libro : ${libros}"
+
+                     th:data-title="${libro.titulo}"
+                     th:data-author="${libro.autor}"
+                     th:data-year="${libro.anio}"
+                     th:data-genre="${libro.genero}"
+                     th:data-rating="${ratingByBook[libro.id] ?: 0}"
+
+                     tabindex="0">
+
+                    <!-- Book Cover -->
+                    <div class="book-cover-wrapper">
+
+                        <img th:src="${#strings.isEmpty(libro.portadaUrl)
+                                    ? '/images/book/Default_fallback.jpg'
+                                    : libro.portadaUrl}"
+                             th:alt="${libro.titulo}"
+                             class="book-cover">
+
+                        <!-- Hover Information -->
+                        <div class="book-popover">
+
+                            <h4 class="popover-title"
+                                th:text="${libro.titulo}">
+                                Book title
+                            </h4>
+
+                            <p class="popover-author"
+                               th:text="${libro.autor}">
+                                Author
+                            </p>
+
+                            <div class="popover-rating">
+
+                                <span>⭐</span>
+
+                                <strong th:text="${
+                                    ratingByBook[libro.id] != null
+                                    ? #numbers.formatDecimal(ratingByBook[libro.id], 1, 1)
+                                    : #messages.msg('explore.rating.noRatings')
+                                }">
+                                    No ratings
+                                </strong>
+
+                            </div>
+
+                            <p class="popover-synopsis"
+                               th:text="${libro.sinopsis}">
+                                Book synopsis
+                            </p>
+
+                            <a th:href="@{/libro/{id}(id=${libro.id})}"
+                               class="btn-primary"
+                               th:text="#{explore.book.details}">
+                                View details
+                            </a>
+
+                        </div>
 
                     </div>
 
@@ -191,54 +270,61 @@
 
             </div>
 
-        </div>
+            <!-- No Results -->
+            <div id="noBooksMessage"
+                 class="no-books-message"
+                 hidden>
 
-        <!-- No Results -->
-        <div id="noBooksMessage"
-            class="no-books-message"
-            hidden>
+                <span>📚</span>
 
-            <span>📚</span>
+                <h3 th:text="#{explore.empty.title}">
+                    No books found
+                </h3>
 
-            <h3>No books found</h3>
+                <p th:text="#{explore.empty.description}">
+                    Try changing your search or filters.
+                </p>
 
-            <p>
-                Try changing your search or filters.
-            </p>
+            </div>
 
-        </div>
+        </main>
 
-    </main>
-  </div>
+    </div>
 
-  <!-- Bottom Navigation Fragment / Markup -->
-  <nav class="bottom-nav">
-    <a th:href="@{/}" class="nav-item">
-      <span class="nav-icon">🏠</span>
-      <span>Home</span>
-    </a>
-    <a th:href="@{/library}" class="nav-item">
-      <span class="nav-icon">📚</span>
-      <span>Library</span>
-    </a>
-    <a th:href="@{/explorar}" class="nav-item active">
-      <span class="nav-icon">🚀</span>
-      <span>Explore</span>
-    </a>
-    <a th:href="@{/search}" class="nav-item">
-      <span class="nav-icon">🔍</span>
-      <span>Search</span>
-    </a>
-  </nav>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
 
-  <!-- Footer Fragment -->
-  <div th:replace="~{fragments/footer :: footer}"></div>
+        <a th:href="@{/}" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span th:text="#{home.nav.home}">Home</span>
+        </a>
+
+        <a th:href="@{/library}" class="nav-item">
+            <span class="nav-icon">📚</span>
+            <span th:text="#{home.nav.library}">Library</span>
+        </a>
+
+        <a th:href="@{/explorar}" class="nav-item active">
+            <span class="nav-icon">🚀</span>
+            <span th:text="#{home.nav.explore}">Explore</span>
+        </a>
+
+        <a th:href="@{/crear-libro}" class="nav-item">
+          <span class="nav-icon">✍️</span>
+          <span th:text="#{home.nav.publish}">Publish</span>
+         </a>
+
+    </nav>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
     <script th:src="@{/js/explore.js}" defer></script>
 
 </body>

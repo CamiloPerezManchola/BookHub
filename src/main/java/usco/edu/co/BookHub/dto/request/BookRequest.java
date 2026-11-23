@@ -1,5 +1,8 @@
 package usco.edu.co.BookHub.dto.request;
 
+import java.util.List;
+
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -25,8 +28,8 @@ public class BookRequest {
     private String portadaUrl;
 
     @NotNull(message = "El año es obligatorio")
-    @Min(value = 0, message = "El año no puede ser negativo")
-    @Max(value = 2026, message = "El año no puede ser futuro")
+    @Min(value = 0)
+    @Max(value = 2026)
     private Integer anio;
 
     @NotBlank(message = "El género es obligatorio")
@@ -35,4 +38,6 @@ public class BookRequest {
     @NotBlank(message = "La sinopsis es obligatoria")
     private String sinopsis;
 
+    @Valid
+    private List<ChapterRequest> capitulos;
 }

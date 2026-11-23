@@ -3,6 +3,7 @@ package usco.edu.co.BookHub.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import usco.edu.co.BookHub.dto.request.ReviewRequest;
 import usco.edu.co.BookHub.dto.response.ReviewResponse;
+import usco.edu.co.BookHub.model.Role;
 import usco.edu.co.BookHub.model.User;
 import usco.edu.co.BookHub.repository.UserRepository;
 import usco.edu.co.BookHub.service.ReviewService;
@@ -108,5 +110,29 @@ public class ReviewController {
         User user = obtenerUsuarioActual(principal);
 
         reviewService.eliminar(id, user);
+    }
+
+    @GetMapping("/admin/reviews")
+    public List<ReviewResponse> obtenerTodasLasResenas(
+            @AuthenticationPrincipal UserDetails principal) {
+
+        User user = obtenerUsuarioActual(principal);
+
+        if (user.getRol() != Role.ADMIN) {
+            throw new AccessDeniedException("Admin only");
+        }
+
+        return reviewService.obtenerTodas();
+    }
+
+    @DeleteMapping("/admin/reviews/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminarComoAdmin(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails principal) {
+
+        User user = obtenerUsuarioActual(principal);
+
+        reviewService.eliminarComoAdmin(id, user);
     }
 }

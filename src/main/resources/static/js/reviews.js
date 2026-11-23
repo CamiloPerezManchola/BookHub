@@ -1,6 +1,49 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    // --------------------------------------------------
+    // TRANSLATIONS
+    // --------------------------------------------------
+
+    const translations = document.getElementById("reviewTranslations");
+
+    function t(key) {
+        return translations?.dataset[key] || key;
+    }
+
+    const locale = document.documentElement.lang || "es";
+
+    // --------------------------------------------------
+    // REVIEW MODAL ELEMENTS
+    // --------------------------------------------------
+
+    const reviewModal = document.getElementById("reviewModal");
+
+    const modalTitle = document.getElementById("reviewModalTitle");
+    const modalEyebrow = document.getElementById("reviewModalEyebrow");
+
+    const editContent = document.getElementById("editReviewContent");
+    const deleteContent = document.getElementById("deleteReviewContent");
+
+    const editReviewForm = document.getElementById("editReviewForm");
+
+    const editRating = document.getElementById("editReviewRating");
+    const editComment = document.getElementById("editReviewComment");
+
+    const modalMessage = document.getElementById("reviewModalMessage");
+
+    const saveReviewButton = document.getElementById("saveReviewButton");
+    const deleteReviewButton = document.getElementById("confirmDeleteButton");
+
+    const cancelModalButton = document.getElementById("cancelReviewModal");
+    const closeModalButton = document.getElementById("closeReviewModal");
+
+    const characterCount = document.getElementById("reviewCharacterCount");
+
+    let selectedReview = null;
+    let modalMode = null;
+    let previousFocus = null;
+
     const section = document.getElementById("reviewsSection");
 
     if (!section) return;
@@ -39,32 +82,49 @@ document.addEventListener("DOMContentLoaded", () => {
             ...options.headers
         };
 
-        if (csrfValue && options.method &&
+        if (csrfValue &&
+            options.method &&
             options.method !== "GET") {
 
-            headers[csrfHeader] = csrfValue;
+            if (csrfHeader) {
+                headers[csrfHeader] = csrfValue;
+            }
         }
 
-        const response = await fetch(url, {
-            ...options,
-            headers,
-            credentials: "same-origin"
-        });
+        let response;
+
+        try {
+
+            response = await fetch(url, {
+                ...options,
+                headers,
+                credentials: "same-origin"
+            });
+
+        } catch (error) {
+
+            throw new Error(t("networkError"));
+
+        }
 
         if (response.status === 401 ||
             response.status === 403) {
 
-            throw new Error(
-                "You don't have permission to perform this action."
-            );
+            throw new Error(t("permissionError"));
         }
 
         if (!response.ok) {
 
             const errorText = await response.text();
 
+            const errorKey = errorText.trim();
+
+            if (errorKey === "serverError") {
+                throw new Error(t("serverError"));
+            }
+
             throw new Error(
-                errorText || "Something went wrong."
+                errorText || t("unknownError")
             );
         }
 
@@ -96,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
         name.className = "reviewer-name";
 
         name.textContent = ownReview
-            ? "You"
+            ? t("you")
             : "@" + review.username;
 
         const rating = document.createElement("span");
@@ -110,9 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         date.className = "review-date";
 
-        date.textContent = new Date(
-            review.fechaCreacion
-        ).toLocaleDateString();
+        const reviewDate = new Date(review.fechaCreacion);
+
+        date.textContent = !isNaN(reviewDate.getTime())
+            ? reviewDate.toLocaleDateString(locale)
+            : "";
 
         header.append(name, rating, date);
 
@@ -121,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
         comment.className = "review-text";
 
         comment.textContent =
-            review.comentario || "No comment provided.";
+            review.comentario || t("noComment");
 
         card.append(header, comment);
 
@@ -136,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             editButton.type = "button";
             editButton.className = "btn-edit-review";
-            editButton.textContent = "Edit";
+            editButton.textContent = "✏️ " + t("edit");
 
             editButton.addEventListener("click", () => {
                 editReview(review);
@@ -146,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             deleteButton.type = "button";
             deleteButton.className = "btn-delete-review";
-            deleteButton.textContent = "Delete";
+            deleteButton.textContent = "🗑️ " + t("delete");
 
             deleteButton.addEventListener("click", () => {
                 deleteReview(review.id);
@@ -174,10 +236,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             communityList.replaceChildren();
 
-            if (reviews.length === 0) {
+            if (!Array.isArray(reviews) || reviews.length === 0) {
 
-                communityList.textContent =
-                    "No reviews yet. Be the first to share your thoughts!";
+                communityList.textContent = t("noCommunityReviews");
 
                 return;
             }
@@ -193,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
 
             communityList.textContent =
-                "Unable to load community reviews.";
+                t("communityLoadError");
 
             console.error(error);
         }
@@ -215,10 +276,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             myReviewsList.replaceChildren();
 
-            if (reviews.length === 0) {
+            if (!Array.isArray(reviews) || reviews.length === 0) {
 
-                myReviewsList.textContent =
-                    "You haven't reviewed this book yet.";
+                myReviewsList.textContent = t("noPersonalReviews");
 
                 return;
             }
@@ -234,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
 
             myReviewsList.textContent =
-                "Unable to load your reviews.";
+                t("personalLoadError");
 
             console.error(error);
         }
@@ -261,14 +321,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!rating || rating < 1 || rating > 5) {
 
                 reviewMessage.textContent =
-                    "Please select a rating between 1 and 5.";
+                    t("invalidRating");
 
                 return;
             }
 
             try {
 
-                const review = await apiRequest(
+                await apiRequest(
                     `/api/books/${bookId}/reviews`,
                     {
                         method: "POST",
@@ -286,8 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 reviewForm.reset();
 
-                reviewMessage.textContent =
-                    "Your review was published successfully!";
+                reviewMessage.textContent = t("createSuccess");
 
                 await Promise.all([
                     loadCommunityReviews(),
@@ -304,39 +363,160 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --------------------------------------------------
+    // MODAL MANAGEMENT
+    // --------------------------------------------------
+
+    function openReviewModal(mode, review = null) {
+
+        modalMode = mode;
+        selectedReview = review;
+
+        previousFocus = document.activeElement;
+
+        modalMessage.textContent = "";
+
+        if (mode === "edit") {
+
+            modalTitle.textContent = t("editTitle");
+            modalEyebrow.textContent = t("yourReview");
+
+            editContent.hidden = false;
+            deleteContent.hidden = true;
+
+            saveReviewButton.hidden = false;
+            deleteReviewButton.hidden = true;
+
+            editRating.value = review.rating;
+            editComment.value = review.comentario || "";
+
+            updateCharacterCount();
+
+            setTimeout(() => editRating.focus(), 100);
+
+        } else {
+
+            modalTitle.textContent = t("deleteTitle");
+            modalEyebrow.textContent = t("confirmAction");
+
+            editContent.hidden = true;
+            deleteContent.hidden = false;
+
+            saveReviewButton.hidden = true;
+            deleteReviewButton.hidden = false;
+
+            setTimeout(() => deleteReviewButton.focus(), 100);
+        }
+
+        reviewModal.classList.add("active");
+        reviewModal.setAttribute("aria-hidden", "false");
+
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeReviewModal() {
+
+        if (saveReviewButton.disabled ||
+            deleteReviewButton.disabled) {
+            return;
+        }
+
+        reviewModal.classList.remove("active");
+        reviewModal.setAttribute("aria-hidden", "true");
+
+        document.body.style.overflow = "";
+
+        selectedReview = null;
+        modalMode = null;
+
+        if (previousFocus) {
+            previousFocus.focus();
+        }
+    }
+
+    function updateCharacterCount() {
+
+        characterCount.textContent =
+            `${editComment.value.length} / 2000`;
+    }
+
+    // Close buttons
+
+    cancelModalButton.addEventListener(
+        "click",
+        closeReviewModal
+    );
+
+    closeModalButton.addEventListener(
+        "click",
+        closeReviewModal
+    );
+
+    // Close when clicking outside the modal
+
+    reviewModal.addEventListener("click", event => {
+
+        if (event.target === reviewModal) {
+            closeReviewModal();
+        }
+    });
+
+    // Close with Escape
+
+    document.addEventListener("keydown", event => {
+
+        if (event.key === "Escape" &&
+            reviewModal.classList.contains("active")) {
+
+            closeReviewModal();
+        }
+    });
+
+    // Character counter
+
+    editComment.addEventListener(
+        "input",
+        updateCharacterCount
+    );
+
+    // --------------------------------------------------
     // EDIT REVIEW
     // --------------------------------------------------
 
-    async function editReview(review) {
+    function editReview(review) {
 
-        const newRating = prompt(
-            "Enter your new rating (1-5):",
-            review.rating
-        );
+        openReviewModal("edit", review);
+    }
 
-        if (newRating === null) return;
+    editReviewForm.addEventListener("submit", async event => {
 
-        const rating = Number(newRating);
+        event.preventDefault();
+
+        if (!selectedReview) return;
+
+        const rating = Number(editRating.value);
+        const comentario = editComment.value.trim();
 
         if (!Number.isInteger(rating) ||
             rating < 1 || rating > 5) {
 
-            alert("Rating must be between 1 and 5.");
+            modalMessage.textContent =
+                t("invalidRating");
 
             return;
         }
 
-        const comentario = prompt(
-            "Edit your comment:",
-            review.comentario || ""
-        );
+        saveReviewButton.disabled = true;
+        saveReviewButton.textContent = t("saving");
 
-        if (comentario === null) return;
+        cancelModalButton.disabled = true;
+        closeModalButton.disabled = true;
+
+        modalMessage.textContent = "";
 
         try {
 
             await apiRequest(
-                `/api/reviews/${review.id}`,
+                `/api/reviews/${selectedReview.id}`,
                 {
                     method: "PUT",
 
@@ -351,6 +531,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             );
 
+            reviewModal.classList.remove("active");
+            reviewModal.setAttribute("aria-hidden", "true");
+
+            document.body.style.overflow = "";
+
+            selectedReview = null;
+            modalMode = null;
+
             await Promise.all([
                 loadCommunityReviews(),
                 loadMyReviews()
@@ -358,19 +546,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            alert(error.message);
+            modalMessage.textContent = error.message;
+
+        } finally {
+
+            saveReviewButton.disabled = false;
+            saveReviewButton.textContent = t("saveChanges");
+
+            cancelModalButton.disabled = false;
+            closeModalButton.disabled = false;
         }
-    }
+
+    });
 
     // --------------------------------------------------
     // DELETE REVIEW
     // --------------------------------------------------
 
-    async function deleteReview(reviewId) {
+    function deleteReview(reviewId) {
 
-        if (!confirm(
-            "Are you sure you want to delete this review?"
-        )) return;
+        openReviewModal("delete", { id: reviewId });
+    }
+
+    deleteReviewButton.addEventListener("click", async () => {
+
+        if (!selectedReview) return;
+
+        const reviewId = selectedReview.id;
+
+        deleteReviewButton.disabled = true;
+        deleteReviewButton.textContent = t("deleting");
+
+        cancelModalButton.disabled = true;
+        closeModalButton.disabled = true;
+
+        modalMessage.textContent = "";
 
         try {
 
@@ -381,6 +591,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             );
 
+            reviewModal.classList.remove("active");
+            reviewModal.setAttribute("aria-hidden", "true");
+
+            document.body.style.overflow = "";
+
+            selectedReview = null;
+            modalMode = null;
+
             await Promise.all([
                 loadCommunityReviews(),
                 loadMyReviews()
@@ -388,9 +606,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            alert(error.message);
+            modalMessage.textContent = error.message;
+
+        } finally {
+
+            deleteReviewButton.disabled = false;
+            deleteReviewButton.textContent = t("deleteReview");
+
+            cancelModalButton.disabled = false;
+            closeModalButton.disabled = false;
         }
-    }
+
+    });
 
     // --------------------------------------------------
     // INITIAL LOAD

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
 
 <head th:replace="~{fragments/head :: head(
     'Publish a Book | BookHub',
@@ -15,13 +16,17 @@
 
         <div class="create-book-header">
 
-            <a th:href="@{/explorar}" class="btn-back">
+            <a th:href="@{/explorar}"
+               class="btn-back"
+               th:text="#{createBook.back}">
                 ← Back to Explore
             </a>
 
-            <h1>Publish a Book</h1>
+            <h1 th:text="#{createBook.title}">
+                Publish a Book
+            </h1>
 
-            <p>
+            <p th:text="#{createBook.subtitle}">
                 Share your favorite books with the BookHub community.
             </p>
 
@@ -29,7 +34,24 @@
 
         <section class="create-book-card">
 
-            <form id="createBookForm">
+            <form id="createBookForm"
+                novalidate
+                  th:data-chapter-label="#{createBook.chapter}"
+                  th:data-chapter-label-plural="#{createBook.chapters}"
+                  th:data-chapter-title="#{createBook.chapterTitle}"
+                  th:data-chapter-title-placeholder="#{createBook.chapterTitlePlaceholder}"
+                  th:data-chapter-content="#{createBook.chapterContent}"
+                  th:data-chapter-content-placeholder="#{createBook.chapterContentPlaceholder}"
+                  th:data-remove="#{createBook.remove}"
+                  th:data-required="#{createBook.js.required}"
+                  th:data-invalid-url="#{createBook.js.invalidUrl}"
+                  th:data-invalid-year="#{createBook.js.invalidYear}"
+                  th:data-invalid-genre="#{createBook.js.invalidGenre}"
+                  th:data-invalid-chapter="#{createBook.js.invalidChapter}"
+                  th:data-publishing="#{createBook.js.publishing}"
+                  th:data-publish="#{createBook.js.publish}"
+                  th:data-publish-success="#{createBook.js.publishSuccess}"
+                  th:data-publish-error="#{createBook.js.publishError}">
 
                 <!-- CSRF -->
                 <input type="hidden"
@@ -44,12 +66,15 @@
                 <!-- Title -->
                 <div class="form-group">
 
-                    <label for="titulo">Book Title</label>
+                    <label for="titulo"
+                           th:text="#{createBook.bookTitle}">
+                        Book Title
+                    </label>
 
                     <input type="text"
                            id="titulo"
                            maxlength="255"
-                           placeholder="Enter the book title"
+                           th:placeholder="#{createBook.bookTitlePlaceholder}"
                            required>
 
                 </div>
@@ -57,11 +82,14 @@
                 <!-- Author -->
                 <div class="form-group">
 
-                    <label for="autor">Author</label>
+                    <label for="autor"
+                           th:text="#{createBook.author}">
+                        Author
+                    </label>
 
                     <input type="text"
                            id="autor"
-                           placeholder="Enter the author's name"
+                           th:placeholder="#{createBook.authorPlaceholder}"
                            required>
 
                 </div>
@@ -69,11 +97,14 @@
                 <!-- Cover URL -->
                 <div class="form-group">
 
-                    <label for="portadaUrl">Book Cover URL</label>
+                    <label for="portadaUrl"
+                           th:text="#{createBook.coverUrl}">
+                        Book Cover URL
+                    </label>
 
                     <input type="url"
                            id="portadaUrl"
-                           placeholder="https://example.com/cover.jpg">
+                           th:placeholder="#{createBook.coverPlaceholder}">
 
                 </div>
 
@@ -82,7 +113,10 @@
 
                     <div class="form-group">
 
-                        <label for="anio">Publication Year</label>
+                        <label for="anio"
+                               th:text="#{createBook.year}">
+                            Publication Year
+                        </label>
 
                         <input type="number"
                                id="anio"
@@ -95,21 +129,67 @@
 
                     <div class="form-group">
 
-                        <label for="genero">Genre</label>
+                        <label for="genero"
+                               th:text="#{createBook.genre}">
+                            Genre
+                        </label>
 
                         <select id="genero" required>
 
-                            <option value="">Select a genre</option>
-                            <option value="Fantasy">Fantasy</option>
-                            <option value="Science Fiction">Science Fiction</option>
-                            <option value="Romance">Romance</option>
-                            <option value="Mystery">Mystery</option>
-                            <option value="Horror">Horror</option>
-                            <option value="Drama">Drama</option>
-                            <option value="Adventure">Adventure</option>
-                            <option value="Biography">Biography</option>
-                            <option value="History">History</option>
-                            <option value="Other">Other</option>
+                            <option value=""
+                                    th:text="#{createBook.genre.select}">
+                                Select a genre
+                            </option>
+
+                            <option value="Fantasy"
+                                    th:text="#{createBook.genre.fantasy}">
+                                Fantasy
+                            </option>
+
+                            <option value="Science Fiction"
+                                    th:text="#{createBook.genre.scifi}">
+                                Science Fiction
+                            </option>
+
+                            <option value="Romance"
+                                    th:text="#{createBook.genre.romance}">
+                                Romance
+                            </option>
+
+                            <option value="Mystery"
+                                    th:text="#{createBook.genre.mystery}">
+                                Mystery
+                            </option>
+
+                            <option value="Horror"
+                                    th:text="#{createBook.genre.horror}">
+                                Horror
+                            </option>
+
+                            <option value="Drama"
+                                    th:text="#{createBook.genre.drama}">
+                                Drama
+                            </option>
+
+                            <option value="Adventure"
+                                    th:text="#{createBook.genre.adventure}">
+                                Adventure
+                            </option>
+
+                            <option value="Biography"
+                                    th:text="#{createBook.genre.biography}">
+                                Biography
+                            </option>
+
+                            <option value="History"
+                                    th:text="#{createBook.genre.history}">
+                                History
+                            </option>
+
+                            <option value="Other"
+                                    th:text="#{createBook.genre.other}">
+                                Other
+                            </option>
 
                         </select>
 
@@ -120,15 +200,93 @@
                 <!-- Synopsis -->
                 <div class="form-group">
 
-                    <label for="sinopsis">Synopsis</label>
+                    <label for="sinopsis"
+                           th:text="#{createBook.synopsis}">
+                        Synopsis
+                    </label>
 
                     <textarea id="sinopsis"
                               rows="6"
-                              placeholder="Tell us what this book is about..."
-                              required>
-                    </textarea>
+                              th:placeholder="#{createBook.synopsisPlaceholder}"
+                              required></textarea>
 
                 </div>
+
+                <!-- Chapters -->
+                <section class="chapter-editor">
+
+                    <div class="chapter-editor-heading">
+
+                        <div>
+                            <h3 th:text="#{createBook.chaptersTitle}">
+                                Book Chapters
+                            </h3>
+
+                            <p th:text="#{createBook.chaptersDescription}">
+                                Add the chapters readers will explore.
+                            </p>
+                        </div>
+
+                        <button type="button"
+                                id="addChapterBtn"
+                                class="btn-secondary"
+                                th:text="#{createBook.addChapter}">
+                            + Add Chapter
+                        </button>
+
+                    </div>
+
+                    <div id="chaptersContainer">
+
+                        <div class="chapter-form-card" data-chapter>
+
+                            <div class="chapter-form-heading">
+
+                                <h4>Chapter 1</h4>
+
+                                <button type="button"
+                                        class="remove-chapter-btn"
+                                        disabled
+                                        th:text="#{createBook.remove}">
+                                    Remove
+                                </button>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label th:text="#{createBook.chapterTitle}">
+                                    Chapter Title
+                                </label>
+
+                                <input type="text"
+                                       class="chapter-title"
+                                       maxlength="200"
+                                       th:placeholder="#{createBook.chapterTitlePlaceholder}"
+                                       required>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label th:text="#{createBook.chapterContent}">
+                                    Chapter Content
+                                </label>
+
+                                <textarea class="chapter-content"
+                                          rows="8"
+                                          th:placeholder="#{createBook.chapterContentPlaceholder}"
+                                          required></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <p id="chapterCount"></p>
+
+                </section>
 
                 <!-- Response message -->
                 <p id="bookMessage"
@@ -138,10 +296,9 @@
 
                 <button type="submit"
                         id="publishBookBtn"
-                        class="btn-primary">
-
+                        class="btn-primary"
+                        th:text="#{createBook.publish}">
                     Publish Book
-
                 </button>
 
             </form>

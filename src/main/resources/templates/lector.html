@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:lang="${#locale.language}">
+<head th:replace="~{fragments/head :: head(
+    'Book Reader | BookHub',
+    'Read books on BookHub.'
+)}">
+</head>
+
+<body class="reader-page">
+
+    <header class="reader-header">
+
+        <a th:href="@{/libro/{id}(id=${libro.id})}"
+        class="reader-back"
+        th:text="#{reader.backToBook}">
+            ← Back to book
+        </a>
+
+        <div class="reader-book-info">
+
+            <strong th:text="${libro.titulo}">
+                Book title
+            </strong>
+
+            <small th:text="${libro.autor}">
+                Author
+            </small>
+
+        </div>
+
+        <div class="reader-controls">
+
+            <button id="decreaseFont"
+                    type="button"
+                    th:attr="aria-label=#{reader.decreaseFont}">
+                A−
+            </button>
+
+            <button id="increaseFont"
+                    type="button"
+                    th:attr="aria-label=#{reader.increaseFont}">
+                A+
+            </button>
+
+            <button id="toggleSidebar"
+                    type="button"
+                    th:attr="aria-label=#{reader.toggleContents}">
+                ☰
+            </button>
+
+        </div>
+
+    </header>
+
+    <div class="reader-layout">
+
+        <!-- CHAPTER SIDEBAR -->
+
+        <aside class="reader-sidebar" id="readerSidebar">
+
+            <h3 th:text="#{reader.contents}">
+                Contents
+            </h3>
+
+            <div id="chapterList">
+
+                <p th:text="#{reader.loadingChapters}">
+                    Loading chapters...
+                </p>
+
+            </div>
+
+        </aside>
+
+        <!-- READING AREA -->
+
+        <main class="reader-main">
+
+            <div class="reading-progress-container">
+
+                <div class="reading-progress-bar"
+                    id="readingProgressBar">
+                </div>
+
+            </div>
+
+            <div class="reader-content">
+
+                <div class="reader-chapter-info">
+
+                    <span id="chapterNumber"
+                        th:text="#{reader.chapterDefault}">
+                        Chapter 1
+                    </span>
+
+                    <div class="reader-chapter-actions">
+
+                        <span id="chapterProgress">0%</span>
+
+                        <button type="button"
+                                id="bookmarkButton"
+                                class="bookmark-button"
+                                aria-pressed="false"
+                                th:text="#{reader.bookmark}">
+                            ♡ Bookmark
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div id="bookmarkMessage"
+                    role="status"
+                    aria-live="polite">
+                </div>
+
+                <h1 id="chapterTitle"
+                    th:text="#{reader.loading}">
+                    Loading...
+                </h1>
+
+                <article id="chapterContent"
+                        class="chapter-content-display">
+
+                    <p th:text="#{reader.waitForChapter}">
+                        Please wait while we load the chapter.
+                    </p>
+
+                </article>
+
+                <div class="reader-navigation">
+
+                    <button id="previousChapter"
+                            type="button"
+                            disabled
+                            th:text="#{reader.previous}">
+                        ← Previous
+                    </button>
+
+                    <button id="nextChapter"
+                            type="button"
+                            disabled
+                            th:text="#{reader.next}">
+                        Next →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <div id="readerBookId"
+        th:attr="data-book-id=${libro.id}"
+        hidden>
+    </div>
+
+    <div id="readerTranslations"
+
+        th:attr="
+            data-chapter=#{reader.chapter},
+            data-chapter-default=#{reader.chapterDefault},
+            data-bookmark=#{reader.bookmark},
+            data-bookmarked=#{reader.bookmarked},
+            data-login-bookmark=#{reader.loginBookmark},
+            data-bookmark-added=#{reader.bookmarkAdded},
+            data-bookmark-removed=#{reader.bookmarkRemoved},
+            data-bookmark-error=#{reader.bookmarkError},
+            data-no-chapters=#{reader.noChapters},
+            data-load-error=#{reader.loadError},
+            data-progress-error=#{reader.progressError},
+            data-chapter-load-error=#{reader.chapterLoadError},
+            data-previous=#{reader.previous},
+            data-next=#{reader.next}
+        "
+
+        hidden>
+    </div>
+
+    <script th:src="@{/js/reader.js}" defer></script>
+
+    <script th:src="@{/js/reader.js}" defer></script>
+
+</body>
+</html>
